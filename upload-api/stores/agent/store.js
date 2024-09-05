@@ -404,6 +404,12 @@ const read = async ({ buckets, channel }, message) => {
  * @param {Store} store
  * @param {API.Link} message
  */
+export const readMessage = (store, message) => read(store, message)
+
+/**
+ * @param {Store} store
+ * @param {API.Link} message
+ */
 export const toMessageURL = (store, message) =>
   new URL(`https://${store.buckets.message.name}.s3.${store.region}.amazonaws.com/${toMessagePath({message})}`)
 

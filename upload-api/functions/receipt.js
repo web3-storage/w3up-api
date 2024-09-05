@@ -36,14 +36,19 @@ export async function receiptGet (event, options = implicitContext()) {
       body: Buffer.from(`No receipt for task ${taskCid} is found`).toString('base64')
     }
   }
-  const url = Store.toMessageURL(store, result.ok.message)
 
-  // redirect to bucket
-  return {
-    statusCode: 302,
-    headers: {
-      Location: url.href
+  const messageRes = await Store.readMessage(store, result.ok.message)
+  if (messageRes.error) {
+    console.error('failed to read message', result.error)
+    return {
+      statusCode: 500,
+      body: Buffer.from('Failed to read receipt').toString('base64')
     }
+  }
+
+  return {
+    statusCode: 200,
+    body: Buffer.from(messageRes.ok).toString('base64')
   }
 }
 
