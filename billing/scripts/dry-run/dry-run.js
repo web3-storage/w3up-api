@@ -34,11 +34,12 @@ dotenv.config({ path: '.env.local' })
 
 const concurrency = 5
 
-const CUSTOMER_TABLE_NAME = mustGetEnv('CUSTOMER_TABLE_NAME')
-const SUBSCRIPTION_TABLE_NAME = mustGetEnv('SUBSCRIPTION_TABLE_NAME')
-const CONSUMER_TABLE_NAME = mustGetEnv('CONSUMER_TABLE_NAME')
-const SPACE_DIFF_TABLE_NAME = mustGetEnv('SPACE_DIFF_TABLE_NAME')
-const SPACE_SNAPSHOT_TABLE_NAME = mustGetEnv('SPACE_SNAPSHOT_TABLE_NAME')
+const STORACHA_ENV = mustGetEnv('STORACHA_ENV')
+const CUSTOMER_TABLE_NAME=`${STORACHA_ENV}-w3infra-customer`
+const SUBSCRIPTION_TABLE_NAME=`${STORACHA_ENV}-w3infra-subscription`
+const CONSUMER_TABLE_NAME=`${STORACHA_ENV}-w3infra-consumer`
+const SPACE_DIFF_TABLE_NAME = `${STORACHA_ENV}-w3infra-space-diff`
+const SPACE_SNAPSHOT_TABLE_NAME = `${STORACHA_ENV}-w3infra-space-snapshot`
 
 const dynamo = new DynamoDBClient()
 

@@ -44,11 +44,13 @@ dotenv.config({ path: '.env.local' })
 const concurrency = 5
 const dynamo = new DynamoDBClient()
 
-const CUSTOMER_TABLE_NAME = mustGetEnv('CUSTOMER_TABLE_NAME')
-const SUBSCRIPTION_TABLE_NAME = mustGetEnv('SUBSCRIPTION_TABLE_NAME')
-const CONSUMER_TABLE_NAME = mustGetEnv('CONSUMER_TABLE_NAME')
-const ALLOCATIONS_TABLE_NAME = mustGetEnv('ALLOCATIONS_TABLE_NAME')
-const STORE_TABLE_NAME = mustGetEnv('STORE_TABLE_NAME')
+const STORACHA_ENV = mustGetEnv('STORACHA_ENV')
+
+const CUSTOMER_TABLE_NAME=`${STORACHA_ENV}-w3infra-customer`
+const SUBSCRIPTION_TABLE_NAME=`${STORACHA_ENV}-w3infra-subscription`
+const CONSUMER_TABLE_NAME=`${STORACHA_ENV}-w3infra-consumer`
+const ALLOCATIONS_TABLE_NAME=`${STORACHA_ENV}-w3infra-allocation`
+const STORE_TABLE_NAME=`${STORACHA_ENV}-w3infra-store`
 
 const customerStore = createCustomerStore(dynamo, {
   tableName: CUSTOMER_TABLE_NAME,

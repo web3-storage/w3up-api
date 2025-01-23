@@ -19,16 +19,21 @@ import { mustGetEnv } from '../../../lib/env.js'
 
 dotenv.config({ path: '.env.local' })
 
-const SPACE_SNAPSHOT_TABLE_NAME = mustGetEnv('SPACE_SNAPSHOT_TABLE_NAME')
+const STORACHA_ENV = mustGetEnv('STORACHA_ENV')
+const SPACE_SNAPSHOT_TABLE_NAME = `${STORACHA_ENV}-w3infra-space-snapshot`
 
 const args = process.argv.slice(2)
 const filename = args[0] // TODO: validate
 
 const dynamo = new DynamoDBClient()
 
-export async function main() {
-  /** @type ParsedSnapshot[]} */
-  const snapshots = await readCsvInput(filename)
+/**
+ * Write up to 100 snapshots
+ * 
+ * @param {ParsedSnapshot[]} snapshots 
+ */
+async function upsertSnapshots(snapshots) {
+  if (snapshots.length > 100) throw new Error('cannot write more than 100 snapshots in one batch - https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/dynamodb/command/TransactWriteItemsCommand/')
 
   /** @type {import('@aws-sdk/client-dynamodb').TransactWriteItem[]} */
   const transactItems = []
@@ -52,12 +57,25 @@ export async function main() {
   /** @type {import('@aws-sdk/client-dynamodb').TransactWriteItemsCommandInput} */
   const transactWriteParams = { TransactItems: transactItems }
 
-  try {
-    const command = new TransactWriteItemsCommand(transactWriteParams)
-    const response = await dynamo.send(command)
-    console.log(response)
-  } catch (err) {
-    console.error('Failed to update or create snapshot!', err)
+  const command = new TransactWriteItemsCommand(transactWriteParams)
+  return await dynamo.send(command)
+}
+
+export async function main() {
+  /** @type ParsedSnapshot[]} */
+  const snapshots = await readCsvInput(filename)
+  console.log(`writing ${snapshots.length} snapshots to ${STORACHA_ENV}'s ${SPACE_SNAPSHOT_TABLE_NAME} dynamo table`)
+  for (let i = 0; i < snapshots.length; i += 100) {
+    const batch = [];
+    for (let j = i; j < i + 100 && j < snapshots.length; j++) {
+      batch.push(snapshots[j]);
+    }
+    try {
+      const response = await upsertSnapshots(batch)
+      console.log(response)
+    } catch (err) {
+      console.error(`Failed to update or create batch ${JSON.stringify(batch, null, 4)}`, err)
+    }
   }
 }
 
