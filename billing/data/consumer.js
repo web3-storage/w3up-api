@@ -2,13 +2,13 @@ import * as Link from 'multiformats/link'
 import { DecodeFailure, EncodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').Consumer} Consumer
- * @typedef {import('../types').InferStoreRecord<Consumer>} ConsumerStoreRecord
- * @typedef {import('../types').StoreRecord} StoreRecord
- * @typedef {import('../lib/api').ConsumerKey} ConsumerKey
- * @typedef {import('../types').InferStoreRecord<ConsumerKey>} ConsumerKeyStoreRecord
- * @typedef {import('../lib/api').ConsumerListKey} ConsumerListKey
- * @typedef {import('../types').InferStoreRecord<ConsumerListKey>} ConsumerListKeyStoreRecord
+ * @typedef {import('../lib/api.js').Consumer} Consumer
+ * @typedef {import('../types.js').InferStoreRecord<Consumer>} ConsumerStoreRecord
+ * @typedef {import('../types.js').StoreRecord} StoreRecord
+ * @typedef {import('../lib/api.js').ConsumerKey} ConsumerKey
+ * @typedef {import('../types.js').InferStoreRecord<ConsumerKey>} ConsumerKeyStoreRecord
+ * @typedef {import('../lib/api.js').ConsumerListKey} ConsumerListKey
+ * @typedef {import('../types.js').InferStoreRecord<ConsumerListKey>} ConsumerListKeyStoreRecord
  * @typedef {Pick<Consumer, 'consumer'|'provider'|'subscription'|'customer'>} ConsumerList
  */
 
@@ -22,10 +22,10 @@ const schema = Schema.struct({
   updatedAt: Schema.date().optional()
 })
 
-/** @type {import('../lib/api').Validator<Consumer>} */
+/** @type {import('../lib/api.js').Validator<Consumer>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<Consumer, ConsumerStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<Consumer, ConsumerStoreRecord>} */
 export const encode = input => {
   try {
     return {
@@ -46,7 +46,7 @@ export const encode = input => {
   }
 }
 
-/** @type {import('../lib/api').Decoder<StoreRecord, Consumer>} */
+/** @type {import('../lib/api.js').Decoder<StoreRecord, Consumer>} */
 export const decode = input => {
   try { 
     return {
@@ -67,7 +67,7 @@ export const decode = input => {
   }
 }
 
-/** @type {import('../lib/api').Encoder<ConsumerKey, ConsumerKeyStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<ConsumerKey, ConsumerKeyStoreRecord>} */
 export const encodeKey = input => ({
   ok: {
     subscription: input.subscription,
@@ -77,9 +77,9 @@ export const encodeKey = input => ({
 
 /** Encoders/decoders for listings. */
 export const lister = {
-  /** @type {import('../lib/api').Encoder<ConsumerListKey, ConsumerListKeyStoreRecord>} */
+  /** @type {import('../lib/api.js').Encoder<ConsumerListKey, ConsumerListKeyStoreRecord>} */
   encodeKey: input => ({ ok: { consumer: input.consumer } }),
-  /** @type {import('../lib/api').Decoder<StoreRecord, ConsumerList>} */
+  /** @type {import('../lib/api.js').Decoder<StoreRecord, ConsumerList>} */
   decode: input => {
     try { 
       return {

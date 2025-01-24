@@ -38,7 +38,7 @@ function createDelegationsBucketKey (cid) {
 /**
  * @param {import('@aws-sdk/client-s3').S3Client} s3client
  * @param {string} bucketName
- * @returns {import('../types').DelegationsBucket}
+ * @returns {import('../types.js').DelegationsBucket}
  */
 export const useDelegationsStore = (s3client, bucketName) => {
   return {

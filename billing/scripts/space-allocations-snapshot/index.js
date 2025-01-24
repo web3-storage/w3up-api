@@ -309,12 +309,12 @@ async function exportSnapshotToCSV() {
   /** @type {Array<[string, string, bigint, string, string]>} */
   const snapshot = []
 
-  for (const customer of /** @type {Array<import('../../lib/api').CustomerDID>} */ (
+  for (const customer of /** @type {Array<import('../../lib/api.js').CustomerDID>} */ (
     Object.keys(result)
   )) {
     for (const spaceAllocation of result[customer].spaceAllocations) {
       const [space, { size }] =
-        /** @type [import('../../lib/api').ConsumerDID, {size:bigint, usage:bigint}] */ (
+        /** @type [import('../../lib/api.js').ConsumerDID, {size:bigint, usage:bigint}] */ (
           Object.entries(spaceAllocation)[0]
         )
 
@@ -340,7 +340,7 @@ async function calculateAndExportUsageSummary() {
   const usageSummary = []
   const duration = to.getTime() - from.getTime()
 
-  for (const customer of /** @type {Array<import('../../lib/api').CustomerDID>} */ (
+  for (const customer of /** @type {Array<import('../../lib/api.js').CustomerDID>} */ (
     Object.keys(result)
   )) {
     if (!result[customer].product) {

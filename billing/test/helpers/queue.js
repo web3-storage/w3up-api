@@ -5,7 +5,7 @@ import { Failure } from '@ucanto/server'
 
 /**
  * @template T
- * @param {import("../lib/api").QueueRemover<T>} q
+ * @param {import('../lib/api.js').QueueRemover<T>} q
  */
 export const collectQueueMessages = async q => {
   /** @type {T[]} */
@@ -32,8 +32,8 @@ export const connectQueue = target =>
  * @param {{ region: string } | import('@aws-sdk/client-sqs').SQSClient} conf
  * @param {object} context
  * @param {URL} context.url
- * @param {import('../../lib/api').Decoder<string, T>} context.decode
- * @returns {import('../lib/api').QueueRemover<T>}
+ * @param {import('../../lib/api.js').Decoder<string, T>} context.decode
+ * @returns {import('../lib/api.js').QueueRemover<T>}
  */
 export function createQueueRemoverClient (conf, context) {
   const client = connectQueue(conf)

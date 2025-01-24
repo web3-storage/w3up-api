@@ -1,5 +1,5 @@
 {
-  "name": "@web3-storage/w3infra-billing",
+  "name": "@storacha/upload-service-infra-billing",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -11,10 +11,11 @@
     "@aws-sdk/client-dynamodb": "^3.515.0",
     "@aws-sdk/client-sqs": "^3.515.0",
     "@aws-sdk/util-dynamodb": "^3.515.0",
+    "@ipld/dag-ucan": "^3.4.5",
     "@sentry/serverless": "^7.74.1",
+    "@storacha/capabilities": "^1.2.0",
     "@ucanto/interface": "^10.0.1",
     "@ucanto/server": "^10.0.0",
-    "@web3-storage/capabilities": "^17.4.1",
     "big.js": "^6.2.1",
     "lru-cache": "^11.0.0",
     "multiformats": "^13.1.0",

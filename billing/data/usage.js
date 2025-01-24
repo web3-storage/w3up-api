@@ -1,11 +1,11 @@
 import { DecodeFailure, EncodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').Usage} Usage
- * @typedef {import('../types').InferStoreRecord<Usage> & { sk: string }} UsageStoreRecord
- * @typedef {import('../lib/api').UsageListKey} UsageListKey
- * @typedef {Omit<import('../types').InferStoreRecord<UsageListKey>, 'from'> & { sk: string }} UsageListKeyStoreRecord
- * @typedef {import('../types').StoreRecord} StoreRecord
+ * @typedef {import('../lib/api.js').Usage} Usage
+ * @typedef {import('../types.js').InferStoreRecord<Usage> & { sk: string }} UsageStoreRecord
+ * @typedef {import('../lib/api.js').UsageListKey} UsageListKey
+ * @typedef {Omit<import('../types.js').InferStoreRecord<UsageListKey>, 'from'> & { sk: string }} UsageListKeyStoreRecord
+ * @typedef {import('../types.js').StoreRecord} StoreRecord
  */
 
 export const schema = Schema.struct({
@@ -20,10 +20,10 @@ export const schema = Schema.struct({
   insertedAt: Schema.date()
 })
 
-/** @type {import('../lib/api').Validator<Usage>} */
+/** @type {import('../lib/api.js').Validator<Usage>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<Usage, UsageStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<Usage, UsageStoreRecord>} */
 export const encode = input => {
   try {
     return {
@@ -48,7 +48,7 @@ export const encode = input => {
 }
 
 export const lister = {
-  /** @type {import('../lib/api').Encoder<UsageListKey, UsageListKeyStoreRecord>} */
+  /** @type {import('../lib/api.js').Encoder<UsageListKey, UsageListKeyStoreRecord>} */
   encodeKey: input => ({
     ok: {
       customer: input.customer,
@@ -59,7 +59,7 @@ export const lister = {
 
 
 
-/** @type {import('../lib/api').Decoder<StoreRecord, Usage>} */
+/** @type {import('../lib/api.js').Decoder<StoreRecord, Usage>} */
 export const decode = input => {
   try {
     return {

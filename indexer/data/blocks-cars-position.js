@@ -6,7 +6,7 @@ import { EncodeFailure } from './lib.js'
  * @typedef {import('../types.js').InferStoreRecord<BlocksCarsPositionRecord>} BlocksCarsPositionStoreRecord
  */
 
-/** @type {import('../lib/api').Encoder<import('../lib/api.js').Location, BlocksCarsPositionStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<import('../lib/api.js').Location, BlocksCarsPositionStoreRecord>} */
 export const encode = input => {
   try {
     return {

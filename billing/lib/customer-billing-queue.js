@@ -2,11 +2,11 @@
  * Discovers spaces that should be billed for a given customer and enqueues
  * a space billing instruction for each.
  * 
- * @param {import('./api').CustomerBillingInstruction} instruction 
+ * @param {import('./api.js').CustomerBillingInstruction} instruction 
  * @param {{
- *   subscriptionStore: import('./api').SubscriptionStore
- *   consumerStore: import('./api').ConsumerStore
- *   spaceBillingQueue: import('./api').SpaceBillingQueue
+ *   subscriptionStore: import('./api.js').SubscriptionStore
+ *   consumerStore: import('./api.js').ConsumerStore
+ *   spaceBillingQueue: import('./api.js').SpaceBillingQueue
  * }} ctx
  * @returns {Promise<import('@ucanto/interface').Result<import('@ucanto/interface').Unit>>}
  */

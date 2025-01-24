@@ -1,25 +1,25 @@
 import { createStripeBillingProvider } from '../billing.js'
 import { test } from './helpers/context.js'
-import { toEmail } from '@web3-storage/did-mailto'
+import { toEmail } from '@storacha/did-mailto'
 import dotenv from 'dotenv'
 
 import Stripe from 'stripe'
 import { fileURLToPath } from 'node:url'
-import { createCustomerStore, customerTableProps } from '@web3-storage/w3infra-billing/tables/customer.js'
+import { createCustomerStore, customerTableProps } from '@storacha/upload-service-infra-billing/tables/customer.js'
 import { createTable } from './helpers/resources.js'
-import { createDynamoDB } from '@web3-storage/w3infra-billing/test/helpers/aws.js'
-import { stripeIDToAccountID } from '@web3-storage/w3infra-billing/utils/stripe.js'
+import { createDynamoDB } from '@storacha/upload-service-infra-billing/test/helpers/aws.js'
+import { stripeIDToAccountID } from '@storacha/upload-service-infra-billing/utils/stripe.js'
 
 dotenv.config({ path: fileURLToPath(new URL('../../.env.local', import.meta.url)) })
 
 /**
  * @typedef {object} BillingContext
- * @property {import('@web3-storage/w3infra-billing/lib/api.js').CustomerStore} BillingContext.customerStore
+ * @property {import('@storacha/upload-service-infra-billing/lib/api.js').CustomerStore} BillingContext.customerStore
  * @property {Stripe} BillingContext.stripe
  * @property {import('../types.js').BillingProvider} BillingContext.billingProvider
  */
 
-const customerDID = /** @type {import('@web3-storage/did-mailto').DidMailto} */(
+const customerDID = /** @type {import('@storacha/did-mailto').DidMailto} */(
   `did:mailto:example.com:w3up-billing-test-${Date.now()}`
 )
 const email = toEmail(customerDID)
@@ -44,7 +44,7 @@ async function getCustomerPlanByEmail(stripe, email) {
  * 
  * @param {Stripe} stripe 
  * @param {string} email 
- * @param {import('@web3-storage/w3infra-billing/lib/api.js').CustomerStore} customerStore
+ * @param {import('@storacha/upload-service-infra-billing/lib/api.js').CustomerStore} customerStore
  * @returns {Promise<Stripe.Customer>}
  */
 async function setupCustomer(stripe, email, customerStore) {

@@ -8,11 +8,12 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { CID } from 'multiformats/cid'
 import { RecordNotFound } from './lib.js'
 import { getDynamoClient } from '../../lib/aws/dynamo.js'
+import { METRICS_NAMES, SPACE_METRICS_NAMES } from '../constants.js'
 
 /**
- * @typedef {import('@web3-storage/upload-api').UploadTable} UploadTable
- * @typedef {import('@web3-storage/upload-api').UploadAddSuccess} UploadAddResult
- * @typedef {import('@web3-storage/upload-api').UploadListItem} UploadListItem
+ * @typedef {import('@storacha/upload-api').UploadTable} UploadTable
+ * @typedef {import('@storacha/upload-api').UploadAddSuccess} UploadAddResult
+ * @typedef {import('@storacha/upload-api').UploadListItem} UploadListItem
  */
 
 /**
@@ -20,30 +21,38 @@ import { getDynamoClient } from '../../lib/aws/dynamo.js'
  *
  * @param {string} region
  * @param {string} tableName
+ * @param {{
+ *   space: import('../types.js').SpaceMetricsStore
+ *   admin: import('../types.js').MetricsStore
+ * }} metrics
  * @param {object} [options]
  * @param {string} [options.endpoint]
  * @returns {UploadTable}
  */
-export function createUploadTable(region, tableName, options = {}) {
+export function createUploadTable(region, tableName, metrics, options = {}) {
   const dynamoDb = getDynamoClient({
     region,
     endpoint: options.endpoint,
   })
-  return useUploadTable(dynamoDb, tableName)
+  return useUploadTable(dynamoDb, tableName, metrics)
 }
 
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
+ * @param {{
+ *   space: import('../types.js').SpaceMetricsStore
+ *   admin: import('../types.js').MetricsStore
+ * }} metrics
  * @returns {UploadTable}
  */
-export function useUploadTable(dynamoDb, tableName) {
+export function useUploadTable(dynamoDb, tableName, metrics) {
   return {
     /**
      * Fetch a single upload
      *
      * @param {import('@ucanto/interface').DID} space
-     * @param {import('@web3-storage/upload-api').UnknownLink} root
+     * @param {import('@storacha/upload-api').UnknownLink} root
      * @returns {ReturnType<UploadTable['get']>}
      */
     get: async (space, root) => {
@@ -65,7 +74,7 @@ export function useUploadTable(dynamoDb, tableName) {
      * Check if the given data CID is bound to a space DID
      *
      * @param {import('@ucanto/interface').DID} space
-     * @param {import('@web3-storage/upload-api').UnknownLink} root
+     * @param {import('@storacha/upload-api').UnknownLink} root
      * @returns {ReturnType<UploadTable['exists']>}
      */
     exists: async (space, root) => {
@@ -88,12 +97,12 @@ export function useUploadTable(dynamoDb, tableName) {
     /**
      * Link a root data CID to a car CID shard in a space DID.
      *
-     * @typedef {import('@web3-storage/upload-api').UploadAddInput} UploadAddInput
+     * @typedef {import('@storacha/upload-api').UploadAddInput} UploadAddInput
      *
      * @param {UploadAddInput} item
      * @returns {ReturnType<UploadTable['upsert']>}
      */
-    upsert: async ({ space, root, shards = [], issuer, invocation }) => {
+    upsert: async ({ space, root, shards = [], issuer, cause }) => {
       const insertedAt = new Date().toISOString()
       const shardSet = new Set(shards.map((s) => s.toString()))
 
@@ -109,10 +118,11 @@ export function useUploadTable(dynamoDb, tableName) {
         ...(shardSet.size > 0 && {
           ':sh': { SS: [...shardSet] }, // SS is "String Set"
         }),
+        ':ca': { S: cause.toString() },
       }
 
       const shardExpression = shards.length ? 'ADD shards :sh' : ''
-      const UpdateExpression = `SET insertedAt=if_not_exists(insertedAt, :ia), updatedAt = :ua ${shardExpression}`
+      const UpdateExpression = `SET cause = :ca, insertedAt = if_not_exists(insertedAt, :ia), updatedAt = :ua ${shardExpression}`
 
       /**
        * upsert!
@@ -134,13 +144,26 @@ export function useUploadTable(dynamoDb, tableName) {
         throw new Error('Missing `Attributes` property on DynamoDB response')
       }
 
-      return { ok: toUploadAddResult(unmarshall(res.Attributes)) }
+      const raw = unmarshall(res.Attributes)
+      // if new, increment total
+      if (raw.insertedAt === raw.updatedAt) {
+        await Promise.all([
+          metrics.space.incrementTotals({
+            [SPACE_METRICS_NAMES.UPLOAD_ADD_TOTAL]: [{ space, value: 1 }]
+          }),
+          metrics.admin.incrementTotals({
+            [METRICS_NAMES.UPLOAD_ADD_TOTAL]: 1,
+          })
+        ])
+      }
+
+      return { ok: toUploadAddResult(raw) }
     },
     /**
      * Remove an upload from an account
      *
      * @param {import('@ucanto/interface').DID} space
-     * @param {import('@web3-storage/upload-api').UnknownLink} root
+     * @param {import('@storacha/upload-api').UnknownLink} root
      * @returns {ReturnType<UploadTable['remove']>}
      */
     remove: async (space, root) => {
@@ -161,6 +184,16 @@ export function useUploadTable(dynamoDb, tableName) {
           throw new Error('missing return values')
         }
         const raw = unmarshall(res.Attributes)
+
+        await Promise.all([
+          metrics.space.incrementTotals({
+            [SPACE_METRICS_NAMES.UPLOAD_REMOVE_TOTAL]: [{ space, value: -1 }]
+          }),
+          metrics.admin.incrementTotals({
+            [METRICS_NAMES.UPLOAD_REMOVE_TOTAL]: 1,
+          })
+        ])
+
         return { ok: toUploadAddResult(raw) }
       } catch (/** @type {any} */ err) {
         if (err.name === 'ConditionalCheckFailedException') {
@@ -173,7 +206,7 @@ export function useUploadTable(dynamoDb, tableName) {
      * List all CARs bound to an account
      *
      * @param {string} space
-     * @param {import('@web3-storage/upload-api').ListOptions} [options]
+     * @param {import('@storacha/upload-api').ListOptions} [options]
      * @returns {ReturnType<UploadTable['list']>}
      */
     list: async (space, options = {}) => {
@@ -224,7 +257,7 @@ export function useUploadTable(dynamoDb, tableName) {
     /**
      * Get information about a CID.
      * 
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').UnknownLink} link
      * @returns {ReturnType<UploadTable['inspect']>}
      */
     inspect: async (link) => {
@@ -260,7 +293,7 @@ export function useUploadTable(dynamoDb, tableName) {
 export function toUploadAddResult({ root, shards }) {
   return {
     root: CID.parse(root),
-    shards: (shards ? [...shards] : []).map((s) => /** @type {import('@web3-storage/upload-api').CARLink} */ (CID.parse(s))),
+    shards: (shards ? [...shards] : []).map((s) => /** @type {import('@storacha/upload-api').CARLink} */ (CID.parse(s))),
   }
 }
 

@@ -1,5 +1,5 @@
 import { sha256 } from 'multiformats/hashes/sha2'
-import { webcrypto } from 'one-webcrypto'
+import { webcrypto } from '@storacha/one-webcrypto'
 import { writeBlockIndexEntries } from '../lib/block-index-writer.js'
 import { bindTestContext, createBlockIndexWriterTestContext } from './helpers/context.js'
 import { base58btc } from 'multiformats/bases/base58'

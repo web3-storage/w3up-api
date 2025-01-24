@@ -3,7 +3,7 @@ import { enqueueCustomerBillingInstructions } from '../../lib/billing-cron.js'
 import { randomCustomer } from '../helpers/customer.js'
 import { collectQueueMessages } from '../helpers/queue.js'
 
-/** @type {import('./api').TestSuite<import('./api').BillingCronTestContext>} */
+/** @type {import('./api.js').TestSuite<import('./api.js').BillingCronTestContext>} */
 export const test = {
   'should queue all the customers': async (/** @type {import('entail').assert} */ assert, ctx) => {
     const customers = []

@@ -11,7 +11,7 @@ import * as HTTP from 'http'
 
 /**
  * @typedef {Partial<{
- *   account: Partial<import('@web3-storage/access/types').Service['space']>
+ *   account: Partial<import('@storacha/access/types').Service['space']>
  * }>} PartialAccessService
  * @typedef {ReturnType<mockAccessService>} MockedAccessService
  * @typedef {{

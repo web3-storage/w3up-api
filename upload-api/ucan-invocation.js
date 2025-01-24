@@ -1,6 +1,6 @@
 import * as CAR from '@ucanto/transport/car'
 import * as Link from 'multiformats/link'
-import { AgentMessage } from '@web3-storage/upload-api'
+import { AgentMessage } from '@storacha/upload-api'
 
 import {
   BadBodyError,
@@ -12,13 +12,7 @@ import {
 
 export const CONTENT_TYPE = CAR.contentType
 
-/**
- * @typedef {import('./types').UcanLogCtx} UcanLogCtx
- * @typedef {import('./types').WorkflowCtx} WorkflowCtx
- * @typedef {import('./types').ReceiptBlockCtx} ReceiptBlockCtx
- * @typedef {import('./types').Workflow} Workflow
- * @typedef {import('./types').ReceiptBlock} ReceiptBlock
- */
+/** @typedef {import('./types.js').UcanLogCtx} UcanLogCtx */
 
 /**
  * @param {import('aws-lambda').APIGatewayProxyEventV2} request
@@ -117,6 +111,6 @@ export const replaceAllLinkValues = (value) => {
  * @param {Link} link
  */
 export const toJSON = (link) =>
-  /** @type {import('@web3-storage/upload-api').LinkJSON<Link>} */ ({
+  /** @type {import('@storacha/upload-api').LinkJSON<Link>} */ ({
     '/': link.toString(),
   })

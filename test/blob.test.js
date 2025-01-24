@@ -3,16 +3,16 @@ import { testBlob as test } from './helpers/context.js'
 import pWaitFor from 'p-wait-for'
 // import { unixfs } from '@helia/unixfs'
 // import { multiaddr } from '@multiformats/multiaddr'
-import * as BlobCapabilities from '@web3-storage/capabilities/blob'
+import * as BlobCapabilities from '@storacha/capabilities/blob'
 import { base58btc } from 'multiformats/bases/base58'
 import * as Link from 'multiformats/link'
 import { equals } from 'multiformats/bytes'
 import { code as RAW_CODE } from 'multiformats/codecs/raw'
 import { HeadObjectCommand } from '@aws-sdk/client-s3'
 import { Assert } from '@web3-storage/content-claims/capability'
-import { ShardingStream, UnixFS, Upload, Index } from '@web3-storage/upload-client'
+import { ShardingStream, UnixFS, Upload, Index } from '@storacha/upload-client'
 import { codec as carCodec } from '@ucanto/transport/car'
-import { ShardedDAGIndex } from '@web3-storage/blob-index'
+import { ShardedDAGIndex } from '@storacha/blob-index'
 import * as AgentStore from '../upload-api/stores/agent.js'
 
 import { METRICS_NAMES, SPACE_METRICS_NAMES } from '../upload-api/constants.js'
@@ -96,13 +96,13 @@ test('blob integration flow with receipts validation', async t => {
   
   // Encode file as Unixfs and perform store/add
   const blocksReadableStream = UnixFS.createFileEncoderStream(file)
-  /** @type {import('@web3-storage/upload-client/types').CARLink[]} */
+  /** @type {import('@storacha/upload-client/types').CARLink[]} */
   const shards = []
   /** @type {Uint8Array[]} */
   const shardBytes = []
-  /** @type {Array<Map<import('@web3-storage/upload-client/types').SliceDigest, import('@web3-storage/upload-client/types').Position>>} */
+  /** @type {Array<Map<import('@storacha/upload-client/types').SliceDigest, import('@storacha/upload-client/types').Position>>} */
   const shardIndexes = []
-  /** @type {import('@web3-storage/upload-client/types').AnyLink | undefined} */
+  /** @type {import('@storacha/upload-client/types').AnyLink | undefined} */
   let root
 
   /** @type {import('multiformats/hashes/digest').Digest<18, number> | undefined} */
@@ -345,8 +345,8 @@ test('10k NFT drop', async t => {
       name: `NFT #${i}`,
       description: 'NFT',
       attributes: Array.from(Array(randomInt(5)), randomTrait),
-      compiler: 'web3.storage',
-      external_url: `https://${id}.nft.web3.storage/token/${i}`
+      compiler: 'storacha.network',
+      external_url: `https://${id}.nft.storacha.network/token/${i}`
     })], `${i}.json`))
   }
 

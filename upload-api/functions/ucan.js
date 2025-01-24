@@ -21,8 +21,8 @@ const AWS_REGION = process.env.AWS_REGION || 'us-west-2'
  */
 async function handlerFn(request) {
   const {
-    INVOCATION_BUCKET_NAME: invocationBucketName = '',
-    WORKFLOW_BUCKET_NAME: workflowBucketName = '',
+    AGENT_INDEX_BUCKET_NAME: agentIndexBucketName = '',
+    AGENT_MESSAGE_BUCKET_NAME: agentMessageBucketName = '',
     UCAN_LOG_STREAM_NAME: streamName = '',
   } = process.env
 
@@ -37,8 +37,8 @@ async function handlerFn(request) {
       },
       region: AWS_REGION,
       buckets: {
-        message: { name: workflowBucketName },
-        index: { name: invocationBucketName },
+        message: { name: agentMessageBucketName },
+        index: { name: agentIndexBucketName },
       },
     },
     stream: {

@@ -1,6 +1,7 @@
-import * as ServiceBlobCaps from '@web3-storage/capabilities/web3.storage/blob'
-import * as BlobCaps from '@web3-storage/capabilities/blob'
-import * as StoreCaps from '@web3-storage/capabilities/store'
+import * as BlobCaps from '@storacha/capabilities/blob'
+import * as SpaceBlobCaps from '@storacha/capabilities/space/blob'
+import * as StoreCaps from '@storacha/capabilities/store'
+import * as DID from '@ipld/dag-ucan/did'
 
 /**
  * Filters UCAN stream messages that are receipts for invocations that alter
@@ -19,10 +20,10 @@ export const findSpaceUsageDeltas = messages => {
     let resource
     /** @type {number|undefined} */
     let size
-    if (isReceiptForCapability(message, ServiceBlobCaps.accept) && isServiceBlobAcceptSuccess(message.out)) {
-      resource = message.value.att[0].nb?.space
+    if (isReceiptForCapability(message, BlobCaps.accept) && isBlobAcceptSuccess(message.out)) {
+      resource = DID.decode(message.value.att[0].nb?.space ?? new Uint8Array()).did()
       size = message.value.att[0].nb?.blob.size
-    } else if (isReceiptForCapability(message, BlobCaps.remove) && isBlobRemoveSuccess(message.out)) {
+    } else if (isReceiptForCapability(message, SpaceBlobCaps.remove) && isSpaceBlobRemoveSuccess(message.out)) {
       resource = /** @type {import('@ucanto/interface').DID} */ (message.value.att[0].with)
       size = -message.out.ok.size
     // TODO: remove me LEGACY store/add
@@ -64,8 +65,8 @@ export const findSpaceUsageDeltas = messages => {
  *
  * @param {import('./api.js').UsageDelta[]} deltas
  * @param {{
- *   spaceDiffStore: import('./api').SpaceDiffStore
- *   consumerStore: import('./api').ConsumerStore
+ *   spaceDiffStore: import('./api.js').SpaceDiffStore
+ *   consumerStore: import('./api.js').ConsumerStore
  * }} ctx
  */
 export const storeSpaceUsageDeltas = async (deltas, ctx) => {
@@ -106,13 +107,17 @@ export const storeSpaceUsageDeltas = async (deltas, ctx) => {
     spaceDiffs.push(...res.ok)
   }
 
+  if (spaceDiffs.length === 0) {
+    return { ok: 'no space diffs to store', error: undefined }
+  }
+
   console.log(`Total space diffs to store: ${spaceDiffs.length}`)
   return ctx.spaceDiffStore.batchPut(spaceDiffs)
 }
 
 /**
- * @param {import('./api').UcanStreamMessage} m
- * @returns {m is import('./api').UcanReceiptMessage}
+ * @param {import('./api.js').UcanStreamMessage} m
+ * @returns {m is import('./api.js').UcanReceiptMessage}
  */
 const isReceipt = m => m.type === 'receipt'
 
@@ -120,7 +125,7 @@ const isReceipt = m => m.type === 'receipt'
  * @param {import('@ucanto/interface').Result} r
  * @returns {r is { ok: import('@web3-storage/capabilities/types').BlobAcceptSuccess }}
  */
-const isServiceBlobAcceptSuccess = (r) =>
+const isBlobAcceptSuccess = (r) =>
   !r.error &&
   r.ok != null &&
   typeof r.ok === 'object' &&
@@ -129,9 +134,9 @@ const isServiceBlobAcceptSuccess = (r) =>
 
 /**
  * @param {import('@ucanto/interface').Result} r
- * @returns {r is { ok: import('@web3-storage/capabilities/types').BlobRemoveSuccess }}
+ * @returns {r is { ok: import('@storacha/capabilities/types').SpaceBlobRemoveSuccess }}
  */
-const isBlobRemoveSuccess = r =>
+const isSpaceBlobRemoveSuccess = r =>
   !r.error &&
   r.ok != null &&
   typeof r.ok === 'object' &&
@@ -140,7 +145,7 @@ const isBlobRemoveSuccess = r =>
 
 /**
  * @param {import('@ucanto/interface').Result} r
- * @returns {r is { ok: import('@web3-storage/capabilities/types').StoreAddSuccess }}
+ * @returns {r is { ok: import('@storacha/capabilities/types').StoreAddSuccess }}
  */
 const isStoreAddSuccess = r =>
   !r.error &&
@@ -151,7 +156,7 @@ const isStoreAddSuccess = r =>
 
 /**
  * @param {import('@ucanto/interface').Result} r
- * @returns {r is { ok: import('@web3-storage/capabilities/types').StoreRemoveSuccess }}
+ * @returns {r is { ok: import('@storacha/capabilities/types').StoreRemoveSuccess }}
  */
 const isStoreRemoveSuccess = r =>
   !r.error &&
@@ -162,8 +167,8 @@ const isStoreRemoveSuccess = r =>
 /**
  * @template {import('@ucanto/interface').Ability} Can
  * @template {import('@ucanto/interface').Unit} Caveats
- * @param {import('./api').UcanReceiptMessage} m
+ * @param {import('./api.js').UcanReceiptMessage} m
  * @param {import('@ucanto/interface').TheCapabilityParser<import('@ucanto/interface').CapabilityMatch<Can, import('@ucanto/interface').Resource, Caveats>>} cap
- * @returns {m is import('./api').UcanReceiptMessage<[import('@ucanto/interface').Capability<Can, import('@ucanto/interface').Resource, Caveats>]>}
+ * @returns {m is import('./api.js').UcanReceiptMessage<[import('@ucanto/interface').Capability<Can, import('@ucanto/interface').Resource, Caveats>]>}
  */
 const isReceiptForCapability = (m, cap) => m.value.att.some(c => c.can === cap.can)

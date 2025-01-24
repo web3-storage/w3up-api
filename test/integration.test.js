@@ -9,7 +9,7 @@ import { base58btc } from 'multiformats/bases/base58'
 import { HeadObjectCommand } from '@aws-sdk/client-s3'
 import { PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { marshall } from '@aws-sdk/util-dynamodb'
-import * as DidMailto from '@web3-storage/did-mailto'
+import * as DidMailto from '@storacha/did-mailto'
 
 import { METRICS_NAMES, SPACE_METRICS_NAMES } from '../upload-api/constants.js'
 

@@ -13,14 +13,14 @@
   },
   "license": "Apache-2.0 OR MIT",
   "dependencies": {
-    "@web3-storage/upload-api": "^18.1.4"
+    "@storacha/upload-api": "^1.2.0"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.226.0",
     "@aws-sdk/util-dynamodb": "^3.226.0",
-    "@ipld/dag-ucan": "3.4.0",
-    "@web3-storage/capabilities": "^14.0.0",
-    "@web3-storage/data-segment": "5.0.0",
+    "@ipld/dag-ucan": "^3.4.5",
+    "@storacha/capabilities": "^1.2.0",
+    "@web3-storage/data-segment": "^5.3.0",
     "sade": "^1.8.1"
   }
 }

@@ -3,7 +3,7 @@
 # uncomment to try out deploying the w3up api under a custom domain (or more
 # than one). the value should match a hosted zone configured in route53 that
 # your aws account has access to.
-# HOSTED_ZONES=up.web3.storage,up.storacha.network
+# HOSTED_ZONES=upload.storacha.network,upload.storacha.network,up.storacha.network
 
 # uncomment to try out deploying the roundabout api under a custom domain.
 # the value should match a hosted zone configured in route53 that your aws account has access to.

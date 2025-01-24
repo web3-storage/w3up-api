@@ -1,6 +1,6 @@
 import { testService as test } from './helpers/context.js'
-import { test as filecoinApiTest } from '@web3-storage/filecoin-api/test'
-import { getMockService, getConnection } from '@web3-storage/filecoin-api/test/context/service'
+import { test as filecoinApiTest } from '@storacha/filecoin-api/test'
+import { getMockService, getConnection } from '@storacha/filecoin-api/test/context/service'
 import * as Signer from '@ucanto/principal/ed25519'
 import { Consumer } from 'sqs-consumer'
 import pWaitFor from 'p-wait-for'

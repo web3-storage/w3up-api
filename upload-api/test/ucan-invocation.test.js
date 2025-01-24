@@ -7,8 +7,8 @@ import * as Signer from '@ucanto/principal/ed25519'
 // eslint-disable-next-line no-unused-vars
 import { Receipt, API } from '@ucanto/core'
 import * as CAR from '@ucanto/transport/car'
-import { add as storeAdd } from '@web3-storage/capabilities/store'
-import { add as uploadAdd } from '@web3-storage/capabilities/upload'
+import { add as storeAdd } from '@storacha/capabilities/store'
+import { add as uploadAdd } from '@storacha/capabilities/upload'
 import { toString } from 'uint8arrays/to-string'
 // @ts-expect-error
 import lambdaUtils from 'aws-lambda-test-utils'

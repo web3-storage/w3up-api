@@ -1,9 +1,9 @@
 /**
- * @returns {import("../../types").BillingProvider}
+ * @returns {import('../../types.js').BillingProvider}
  */
 export function createTestBillingProvider() {
   /**
-   * @type {Record<import("@web3-storage/upload-api").AccountDID, import("@ucanto/interface").DID>}
+   * @type {Record<import("@storacha/upload-api").AccountDID, import("@ucanto/interface").DID>}
    */
   const customers = {}
   return {

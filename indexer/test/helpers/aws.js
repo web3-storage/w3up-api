@@ -1,7 +1,7 @@
 import { GenericContainer as Container } from 'testcontainers'
 import { CreateTableCommand, DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { CreateQueueCommand, SQSClient } from '@aws-sdk/client-sqs'
-import { webcrypto } from 'one-webcrypto'
+import { webcrypto } from '@storacha/one-webcrypto'
 
 /**
  * @template T

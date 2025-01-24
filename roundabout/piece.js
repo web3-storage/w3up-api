@@ -1,5 +1,4 @@
-import { read } from '@web3-storage/content-claims/client'
-
+import { Client } from '@storacha/indexing-service-client'
 import { PIECE_V1_CODE, PIECE_V1_MULTIHASH, PIECE_V2_MULTIHASH, RAW_CODE } from './constants.js'
 
 /** 
@@ -33,29 +32,29 @@ export function asPieceCidV1 (cid) {
  * Find the set of CIDs that are claimed to be equivalent to the Piece CID.
  * 
  * @param {CID} piece
- * @param {(CID) => Promise<Claim[]>} [fetchClaims] - returns content claims for a cid
+ * @param {Client} [indexingService] - returns content claims for a cid
  */
-export async function findEquivalentCids (piece, fetchClaims = createClaimsClientForEnv()) {
+export async function findEquivalentCids (piece, indexingService = createIndexingServiceClient()) {
   /** @type {Set<import('multiformats').UnknownLink>} */
   const cids = new Set()
-  const claims = await fetchClaims(piece)
-  for (const claim of claims) {
-    // claims will include _all_ claims about this cid, so we filter to `equals`
-    if (claim.type !== 'assert/equals') {
+
+  const res = await indexingService.queryClaims({ hashes: [piece.multihash] })
+  if (res.error) throw new Error('failed to query claims', { cause: res.error })
+
+  for (const claim of res.ok.claims.values()) {
+    const cap = claim.capabilities[0]
+    if (cap?.can !== 'assert/equals') {
       continue
     }
     // an equivalence claim may have the pieceCid as the content cid _or_ the equals cid
     // so if content does not equal piece, we can grab the content. Otherwise equals
-    const equivalentCid = claim.content.equals(piece) ? claim.equals : claim.content
+    const equivalentCid = cap.nb?.content.equals(piece) ? cap.nb.equals : cap.nb.content
     cids.add(equivalentCid)
   }
   return cids
 }
 
-/** @param {'prod' | *} env */
-export function createClaimsClientForEnv (env = process.env.SST_STAGE) {
-  if (env === 'prod') {
-    return read
-  }
-  return (cid, opts) => read(cid, { serviceURL: 'https://staging.claims.web3.storage', ...opts })
+/** @param {'prod' | string} env */
+export function createIndexingServiceClient (env = process.env.SST_STAGE) {
+  return new Client(env === 'prod' ? {} : { serviceURL: 'https://staging.claims.web3.storage' })
 }

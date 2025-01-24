@@ -2,7 +2,7 @@ import {
   accountIDToStripeCustomerID, 
   stripeIDToAccountID,
   handleCustomerSubscriptionCreated } from '../../utils/stripe.js'
-import * as DidMailto from '@web3-storage/did-mailto'
+import * as DidMailto from '@storacha/did-mailto'
 
 
 /** @type {import('../lib/api.js').TestSuite<import('../lib/api.js').StripeTestContext>} */

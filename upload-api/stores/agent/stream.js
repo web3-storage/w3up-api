@@ -82,6 +82,25 @@ export const write = async (connection, message) => {
  * @param {Stream} connection.stream
  */
 export const assert = async (message, { stream, store }) => {
+  /** @param {API.UnknownLink} task */
+  const findInvocation = async (task) => {
+    // is the invocation in the message?
+    for (const member of message.index) {
+      if (member.invocation?.task.toString() === task.toString()) {
+        return member.invocation.invocation
+      }
+    }
+    // else find in store
+    const result = await Store.getInvocation(store, task)
+    if ('error' in result) {
+      console.error(result.error)
+      throw new NoInvocationFoundForGivenReceiptError(
+        `missing invocation: ${task}`
+      )
+    }
+    return result.ok
+  }
+
   const records = []
   for (const member of message.index) {
     if (member.invocation) {
@@ -115,14 +134,7 @@ export const assert = async (message, { stream, store }) => {
       // 🔬 Need to figure if there are consumers downstream that depend on
       // having invocation details in the stream record and whether we can
       // safely remove it because this additional IO which seems unnecessary.
-      const result = await Store.getInvocation(store, task)
-      const { ok: invocation } = result
-      if (!invocation) {
-        console.error(result.error)
-        throw new NoInvocationFoundForGivenReceiptError(
-          `Could not find invocation with CID ${task.link().toString()} for receipt with CID: ${receipt.link().toString()}`
-        )
-      }
+      const invocation = await findInvocation(task)
 
       // log any likely JSON serialization errors in the receipt
       // big ints are handled below but worth understand what's
