@@ -14,9 +14,9 @@ export const connectQueue = target =>
  * @param {{ region: string } | import('@aws-sdk/client-sqs').SQSClient} conf
  * @param {object} context
  * @param {URL} context.url
- * @param {import('../lib/api').Validator<T>} context.validate
- * @param {import('../lib/api').Encoder<T, string>} context.encode
- * @returns {import('../lib/api').QueueAdder<T>}
+ * @param {import('../lib/api.js').Validator<T>} context.validate
+ * @param {import('../lib/api.js').Encoder<T, string>} context.encode
+ * @returns {import('../lib/api.js').QueueAdder<T>}
  */
 export function createQueueAdderClient (conf, context) {
   const client = connectQueue(conf)

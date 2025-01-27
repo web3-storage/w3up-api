@@ -2,7 +2,7 @@ import * as dagJSON from '@ipld/dag-json'
 import { EncodeFailure, DecodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').SpaceBillingInstruction} SpaceBillingInstruction
+ * @typedef {import('../lib/api.js').SpaceBillingInstruction} SpaceBillingInstruction
  */
 
 export const schema = Schema.struct({
@@ -15,10 +15,10 @@ export const schema = Schema.struct({
   to: Schema.date()
 })
 
-/** @type {import('../lib/api').Validator<SpaceBillingInstruction>} */
+/** @type {import('../lib/api.js').Validator<SpaceBillingInstruction>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<SpaceBillingInstruction, string>} */
+/** @type {import('../lib/api.js').Encoder<SpaceBillingInstruction, string>} */
 export const encode = message => {
   try {
     const data = {
@@ -36,7 +36,7 @@ export const encode = message => {
   }
 }
 
-/** @type {import('../lib/api').Decoder<string, SpaceBillingInstruction>} */
+/** @type {import('../lib/api.js').Decoder<string, SpaceBillingInstruction>} */
 export const decode = str => {
   try {
     const data = dagJSON.parse(str)

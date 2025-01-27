@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/serverless'
 import { Config } from 'sst/node/config'
-import * as storefrontEvents from '@web3-storage/filecoin-api/storefront/events'
+import * as storefrontEvents from '@storacha/filecoin-api/storefront/events'
 import * as DID from '@ipld/dag-ucan/did'
 import * as Delegation from '@ucanto/core/delegation'
 import { fromString } from 'uint8arrays/from-string'
@@ -20,7 +20,7 @@ Sentry.AWSLambda.init({
 const AWS_REGION = process.env.AWS_REGION || 'us-west-2'
 
 export async function handleCronTick () {
-  const { did, pieceTableName, workflowBucketName, invocationBucketName, aggregatorDid, storefrontProof } = getEnv()
+  const { did, pieceTableName, agentMessageBucketName, agentIndexBucketName, aggregatorDid, storefrontProof } = getEnv()
   const { PRIVATE_KEY: privateKey } = Config
 
   // create context
@@ -40,8 +40,8 @@ export async function handleCronTick () {
   const context = {
     id,
     pieceStore: createPieceTable(AWS_REGION, pieceTableName),
-    taskStore: createTaskStore(AWS_REGION, invocationBucketName, workflowBucketName),
-    receiptStore: createReceiptStore(AWS_REGION, invocationBucketName, workflowBucketName),
+    taskStore: createTaskStore(AWS_REGION, agentIndexBucketName, agentMessageBucketName),
+    receiptStore: createReceiptStore(AWS_REGION, agentIndexBucketName, agentMessageBucketName),
     aggregatorId: DID.parse(aggregatorDid),
   }
 
@@ -64,8 +64,8 @@ function getEnv () {
   return {
     did: mustGetEnv('DID'),
     pieceTableName: mustGetEnv('PIECE_TABLE_NAME'),
-    workflowBucketName: mustGetEnv('WORKFLOW_BUCKET_NAME'),
-    invocationBucketName: mustGetEnv('INVOCATION_BUCKET_NAME'),
+    agentMessageBucketName: mustGetEnv('AGENT_MESSAGE_BUCKET_NAME'),
+    agentIndexBucketName: mustGetEnv('AGENT_INDEX_BUCKET_NAME'),
     aggregatorDid: mustGetEnv('AGGREGATOR_DID'),
     storefrontProof: process.env.PROOF,
   }

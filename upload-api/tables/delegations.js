@@ -10,16 +10,11 @@ import { CID } from 'multiformats/cid'
 import {
   bytesToDelegations,
   delegationsToBytes
-} from '@web3-storage/access/encoding'
+} from '@storacha/access/encoding'
 // eslint-disable-next-line no-unused-vars
 import * as Ucanto from '@ucanto/interface'
 import { Failure } from '@ucanto/server'
-import { CAR, Delegation, parseLink } from '@ucanto/core'
-import {
-  NoInvocationFoundForGivenCidError,
-  NoDelegationFoundForGivenCidError,
-  FailedToDecodeDelegationForGivenCidError
-} from '../errors.js'
+import { parseLink } from '@ucanto/core'
 import { getDynamoClient } from '../../lib/aws/dynamo.js'
 
 // Feature flag for looking up delegations in the invocations in which
@@ -41,31 +36,27 @@ const DELEGATIONS_FIND_DEFAULT_LIMIT = 1000
  * @param {string} region
  * @param {string} tableName
  * @param {object} deps
- * @param {import('../types').DelegationsBucket} deps.bucket
- * @param {import('../types').InvocationBucket} deps.invocationBucket
- * @param {import('../types').WorkflowBucket} deps.workflowBucket
+ * @param {import('../types.js').DelegationsBucket} deps.bucket
  * @param {object} [options]
  * @param {string} [options.endpoint]
  */
-export function createDelegationsTable (region, tableName, { bucket, invocationBucket, workflowBucket }, options = {}) {
+export function createDelegationsTable (region, tableName, { bucket }, options = {}) {
   const dynamoDb = getDynamoClient({
     region,
     endpoint: options.endpoint,
   })
 
-  return useDelegationsTable(dynamoDb, tableName, { bucket, invocationBucket, workflowBucket })
+  return useDelegationsTable(dynamoDb, tableName, { bucket })
 }
 
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
  * @param {object} deps
- * @param {import('../types').DelegationsBucket} deps.bucket
- * @param {import('../types').InvocationBucket} deps.invocationBucket
- * @param {import('../types').WorkflowBucket} deps.workflowBucket
- * @returns {import('@web3-storage/upload-api').DelegationsStorage}
+ * @param {import('../types.js').DelegationsBucket} deps.bucket
+ * @returns {import('@storacha/upload-api').DelegationsStorage}
  */
-export function useDelegationsTable (dynamoDb, tableName, { bucket, invocationBucket, workflowBucket }) {
+export function useDelegationsTable (dynamoDb, tableName, { bucket }) {
   return {
     putMany: async (delegations, options = {}) => {
       if (delegations.length === 0) {
@@ -131,16 +122,7 @@ export function useDelegationsTable (dynamoDb, tableName, { bucket, invocationBu
         if (FIND_DELEGATIONS_IN_INVOCATIONS && cause) {
           // if this row has a cause, it is the CID of the invocation that contained these delegations
           // and we can pull them from there
-          const invocationCid = /** @type {Ucanto.Link} */ (parseLink(cause))
-          const result = await findDelegationInInvocation(
-            {
-              invocationBucket, workflowBucket,
-              invocationCid, delegationCid
-            }
-          )
-          return result.ok ? result : (
-            { error: new Failure(`could not find delegation ${delegationCid} from invocation ${invocationCid}`) }
-          )
+          return { error: new Failure('not implemented') }
         } else {
           // otherwise, we'll try to find the delegation in the R2 bucket we used to stash them in
           const result = await cidToDelegation(bucket, delegationCid)
@@ -173,7 +155,7 @@ export function useDelegationsTable (dynamoDb, tableName, { bucket, invocationBu
 
 /**
  * 
- * @param {import('../types').DelegationsBucket} bucket
+ * @param {import('../types.js').DelegationsBucket} bucket
  * @param {Ucanto.Delegation<Ucanto.Tuple<Ucanto.Capability>>[]} delegations
  */
 async function writeDelegations (bucket, delegations) {
@@ -189,7 +171,7 @@ async function writeDelegations (bucket, delegations) {
 
 /**
  * 
- * @param {import('../types').DelegationsBucket} bucket
+ * @param {import('../types.js').DelegationsBucket} bucket
  * @param {Iterable<readonly [key: CID, value: Uint8Array ]>} entries
  */
 async function writeEntries (bucket, entries) {
@@ -212,7 +194,7 @@ function createDelegationItem (d, cause) {
 }
 
 /** 
- * @param {import('../types').DelegationsBucket} bucket
+ * @param {import('../types.js').DelegationsBucket} bucket
  * @param {Ucanto.Link} cid
  * @returns {Promise<Ucanto.Result<Ucanto.Delegation, Ucanto.Failure>>}
  */
@@ -227,42 +209,4 @@ async function cidToDelegation (bucket, cid) {
     return { error: new Failure(`failed to parse delegation with expected cid ${cid.toString(base32)}`) }
   }
   return { ok: delegation }
-}
-
-/** 
- * @typedef {NoInvocationFoundForGivenCidError | NoDelegationFoundForGivenCidError | FailedToDecodeDelegationForGivenCidError} FindDelegationError
- * @param {object} opts
- * @param {import('../types').InvocationBucket} opts.invocationBucket
- * @param {import('../types').WorkflowBucket} opts.workflowBucket
- * @param {Ucanto.UCANLink} opts.invocationCid
- * @param {Ucanto.Link} opts.delegationCid
- * @returns {Promise<Ucanto.Result<Ucanto.Delegation, FindDelegationError>>}
- */
-async function findDelegationInInvocation ({ invocationBucket, workflowBucket, invocationCid, delegationCid }) {
-  const agentMessageWithInvocationCid = await invocationBucket.getInLink(
-    invocationCid.toString()
-  )
-  if (!agentMessageWithInvocationCid) {
-    return { error: new NoInvocationFoundForGivenCidError() }
-  }
-  const agentMessageBytes = await workflowBucket.get(
-    agentMessageWithInvocationCid
-  )
-  if (!agentMessageBytes) {
-    return { error: new NoInvocationFoundForGivenCidError() }
-  }
-  const { blocks } = CAR.decode(agentMessageBytes)
-  const delegation = Delegation.view({ blocks, root: delegationCid }, null)
-  if (delegation === null) {
-    return { error: new NoDelegationFoundForGivenCidError() }
-  }
-  try {
-    // calling data here has the side effect of materializing the lazy data
-    // @gozala recommended doing this but we should not need to in future versions of Ucanto
-    // eslint-disable-next-line no-unused-expressions
-    delegation.data
-    return { ok: delegation }
-  } catch {
-    return { error: new FailedToDecodeDelegationForGivenCidError() }
-  }
 }

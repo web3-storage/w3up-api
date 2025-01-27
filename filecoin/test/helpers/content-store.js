@@ -6,8 +6,8 @@ import * as raw from 'multiformats/codecs/raw'
 
 /**
  * @typedef {import('multiformats').UnknownLink} UnknownLink
- * @typedef {import('@web3-storage/filecoin-api/test/types').TestContentStore<UnknownLink, Uint8Array>} TestContentStoreInterface
- * @typedef {import('@web3-storage/filecoin-api/storefront/api').ContentStore<UnknownLink, Uint8Array>} ContentStore
+ * @typedef {import('@storacha/filecoin-api/test/types').TestContentStore<UnknownLink, Uint8Array>} TestContentStoreInterface
+ * @typedef {import('@storacha/filecoin-api/storefront/api').ContentStore<UnknownLink, Uint8Array>} ContentStore
  */
 
 /**

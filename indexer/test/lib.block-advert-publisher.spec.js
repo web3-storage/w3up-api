@@ -1,6 +1,6 @@
 import { sha256 } from 'multiformats/hashes/sha2'
 import { equals } from 'multiformats/bytes'
-import { webcrypto } from 'one-webcrypto'
+import { webcrypto } from '@storacha/one-webcrypto'
 import { publishBlockAdvertisement } from '../lib/block-advert-publisher.js'
 import { bindTestContext, createBlockAdvertPublisherTestContext } from './helpers/context.js'
 import { collectQueueMessages } from './helpers/queue.js'

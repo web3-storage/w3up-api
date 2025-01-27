@@ -33,7 +33,7 @@ export const spaceDiffTableProps = {
 /**
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {{ tableName: string }} context
- * @returns {import('../lib/api').SpaceDiffStore}
+ * @returns {import('../lib/api.js').SpaceDiffStore}
  */
 export const createSpaceDiffStore = (conf, { tableName }) => ({
   ...createStoreBatchPutterClient(conf, { tableName, validate, encode }),

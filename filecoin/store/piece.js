@@ -7,17 +7,17 @@ import {
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { parseLink } from '@ucanto/server'
 
-import { StoreOperationFailed, RecordNotFound } from '@web3-storage/filecoin-api/errors'
+import { StoreOperationFailed, RecordNotFound } from '@storacha/filecoin-api/errors'
 import { getDynamoClient } from '../../lib/aws/dynamo.js'
 
 /**
  * @typedef {'submitted' | 'accepted' | 'invalid'} PieceStatus
- * @typedef {import('@web3-storage/filecoin-api/storefront/api').PieceRecord} PieceRecord
- * @typedef {import('@web3-storage/filecoin-api/storefront/api').PieceRecordKey} PieceRecordKey
+ * @typedef {import('@storacha/filecoin-api/storefront/api').PieceRecord} PieceRecord
+ * @typedef {import('@storacha/filecoin-api/storefront/api').PieceRecordKey} PieceRecordKey
  * @typedef {{ status: PieceStatus }} PieceRecordQuery
- * @typedef {import('../types').PieceStoreRecord} PieceStoreRecord
- * @typedef {import('../types').PieceStoreRecordKey} PieceStoreRecordKey
- * @typedef {import('../types').PieceStoreRecordStatus} PieceStoreRecordStatus
+ * @typedef {import('../types.js').PieceStoreRecord} PieceStoreRecord
+ * @typedef {import('../types.js').PieceStoreRecordKey} PieceStoreRecordKey
+ * @typedef {import('../types.js').PieceStoreRecordStatus} PieceStoreRecordStatus
  */
 
 /**
@@ -135,7 +135,7 @@ const encodeQueryProps = (recordKey) => {
  * @param {string} tableName
  * @param {object} [options]
  * @param {string} [options.endpoint]
- * @returns {import('@web3-storage/filecoin-api/storefront/api').PieceStore}
+ * @returns {import('@storacha/filecoin-api/storefront/api').PieceStore}
  */
 export function createPieceTable (region, tableName, options = {}) {
   const dynamoDb = getDynamoClient({
@@ -149,7 +149,7 @@ export function createPieceTable (region, tableName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('@web3-storage/filecoin-api/storefront/api').PieceStore}
+ * @returns {import('@storacha/filecoin-api/storefront/api').PieceStore}
  */
 export function usePieceTable(dynamoDb, tableName) {
   return {

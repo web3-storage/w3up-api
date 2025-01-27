@@ -27,7 +27,7 @@ export function createRateLimitTable (region, tableName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('@web3-storage/upload-api').RateLimitsStorage}
+ * @returns {import('@storacha/upload-api').RateLimitsStorage}
  */
 export function useRateLimitTable (dynamoDb, tableName) {
   return {

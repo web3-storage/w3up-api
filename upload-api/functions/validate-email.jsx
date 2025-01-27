@@ -1,26 +1,26 @@
 import * as Sentry from '@sentry/serverless'
-import { authorize } from '@web3-storage/upload-api/validate'
+import { authorize } from '@storacha/upload-api/validate'
 import { Config } from 'sst/node/config'
-import * as DidMailto from '@web3-storage/did-mailto'
+import * as DidMailto from '@storacha/did-mailto'
 import { getServiceSigner, parseServiceDids } from '../config.js'
 import { Email } from '../email.js'
 import { createDelegationsTable } from '../tables/delegations.js'
 import { createDelegationsStore } from '../buckets/delegations-store.js'
-import { createInvocationStore } from '../buckets/invocation-store.js'
-import { createWorkflowStore } from '../buckets/workflow-store.js'
 import { createSubscriptionTable } from '../tables/subscription.js'
 import { createConsumerTable } from '../tables/consumer.js'
 import { createRevocationsTable } from '../stores/revocations.js'
 import { createReferralStore } from '../stores/referrals.js'
 import * as AgentStore from '../stores/agent.js'
 import { useProvisionStore } from '../stores/provisions.js'
+// @ts-expect-error
 // eslint-disable-next-line import/extensions
 import * as htmlStoracha from '../html-storacha'
+// @ts-expect-error
 // eslint-disable-next-line import/extensions
 import * as htmlW3s from '../html-w3s'
 import { createRateLimitTable } from '../tables/rate-limit.js'
 import { createSpaceMetricsTable } from '../tables/space-metrics.js'
-import { createCustomerStore } from '@web3-storage/w3infra-billing/tables/customer'
+import { createCustomerStore } from '../../billing/tables/customer.js'
 
 const html = process.env.HOSTED_ZONE === 'up.web3.storage' ? htmlW3s : htmlStoracha
 
@@ -31,7 +31,7 @@ Sentry.AWSLambda.init({
 })
 
 /**
- * @param {htmlStoracha.HtmlResponse} response
+ * @param {Response & { getStringBody: () => string }} response
  */
 export function toLambdaResponse(response) {
   const { status = 200, headers: responseHeaders, body } = response
@@ -82,8 +82,8 @@ function createAuthorizeContext() {
     R2_ACCESS_KEY_ID = '',
     R2_SECRET_ACCESS_KEY = '',
     R2_DELEGATION_BUCKET_NAME = '',
-    INVOCATION_BUCKET_NAME = '',
-    WORKFLOW_BUCKET_NAME = '',
+    AGENT_INDEX_BUCKET_NAME = '',
+    AGENT_MESSAGE_BUCKET_NAME = '',
     POSTMARK_TOKEN = '',
     SUBSCRIPTION_TABLE_NAME = '',
     CONSUMER_TABLE_NAME = '',
@@ -100,11 +100,7 @@ function createAuthorizeContext() {
     DYNAMO_DB_ENDPOINT: dbEndpoint,
   } = process.env
   const { PRIVATE_KEY } = Config
-  const invocationBucket = createInvocationStore(
-    AWS_REGION,
-    INVOCATION_BUCKET_NAME
-  )
-  const workflowBucket = createWorkflowStore(AWS_REGION, WORKFLOW_BUCKET_NAME)
+
   const delegationBucket = createDelegationsStore(
     R2_ENDPOINT,
     R2_ACCESS_KEY_ID,
@@ -140,8 +136,8 @@ function createAuthorizeContext() {
       },
       region: AWS_REGION,
       buckets: {
-        message: { name: WORKFLOW_BUCKET_NAME },
-        index: { name: INVOCATION_BUCKET_NAME },
+        message: { name: AGENT_MESSAGE_BUCKET_NAME },
+        index: { name: AGENT_INDEX_BUCKET_NAME },
       },
     },
     stream: {
@@ -161,7 +157,7 @@ function createAuthorizeContext() {
     delegationsStorage: createDelegationsTable(
       AWS_REGION,
       DELEGATION_TABLE_NAME,
-      { bucket: delegationBucket, invocationBucket, workflowBucket }
+      { bucket: delegationBucket }
     ),
     revocationsStorage: createRevocationsTable(
       AWS_REGION,

@@ -31,7 +31,7 @@ export const spaceSnapshotTableProps = {
 /**
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {{ tableName: string }} context
- * @returns {import('../lib/api').SpaceSnapshotStore}
+ * @returns {import('../lib/api.js').SpaceSnapshotStore}
  */
 export const createSpaceSnapshotStore = (conf, { tableName }) => ({
   ...createStorePutterClient(conf, { tableName, validate, encode }),

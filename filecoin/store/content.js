@@ -1,9 +1,9 @@
-import { StoreOperationFailed, RecordNotFound } from '@web3-storage/filecoin-api/errors'
+import { StoreOperationFailed, RecordNotFound } from '@storacha/filecoin-api/errors'
 import pRetry from 'p-retry'
 
 /**
  * @typedef {import('multiformats').UnknownLink} UnknownLink
- * @typedef {import('@web3-storage/filecoin-api/storefront/api').ContentStore<UnknownLink, Uint8Array>} ContentStore
+ * @typedef {import('@storacha/filecoin-api/storefront/api').ContentStore<UnknownLink, Uint8Array>} ContentStore
  */
 
 /**

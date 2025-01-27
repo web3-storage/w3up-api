@@ -18,7 +18,7 @@ Sentry.AWSLambda.init({
 
 /**
  * 
- * @type {import('../bridge/types').AuthSecretHeaderParser}
+ * @type {import('../bridge/types.js').AuthSecretHeaderParser}
  */
 async function parseAuthSecretHeader(headerValue) {
   const secret = base64url.decode(headerValue)
@@ -27,7 +27,7 @@ async function parseAuthSecretHeader(headerValue) {
 }
 
 /**
- * @type {import('../bridge/types').AuthorizationHeaderParser}
+ * @type {import('../bridge/types.js').AuthorizationHeaderParser}
  */
 async function parseAuthorizationHeader(headerValue) {
   const result = await Delegation.extract(base64url.decode(headerValue))
@@ -41,14 +41,14 @@ async function parseAuthorizationHeader(headerValue) {
 }
 
 /**
- * @type {import('../bridge/types').TaskParser}
+ * @type {import('../bridge/types.js').TaskParser}
  */
 async function parseTask(maybeTask) {
   if (Array.isArray(maybeTask)) {
     return (maybeTask[0] && maybeTask[1] && maybeTask[2]) ? {
       // TODO: should we do more verification of the format of these arguments?
       // weird to have to cast twice, but TypeScript complains unless I cast back to unknown first
-      ok: /** @type {import('../bridge/types').Task} */(/** @type {unknown} */(maybeTask))
+      ok: /** @type {import('../bridge/types.js').Task} */(/** @type {unknown} */(maybeTask))
     } : {
       error: {
         name: 'InvalidTask',
@@ -67,12 +67,12 @@ async function parseTask(maybeTask) {
 
 /**
  * 
- * @type {import('../bridge/types').TasksParser}
+ * @type {import('../bridge/types.js').TasksParser}
  */
 async function parseTasks(maybeTasks) {
   if (Array.isArray(maybeTasks)) {
     /**
-     * @type {import('../bridge/types').Task[]}
+     * @type {import('../bridge/types.js').Task[]}
      */
     const tasks = []
     for (const maybeTask of maybeTasks) {
@@ -97,7 +97,7 @@ async function parseTasks(maybeTasks) {
 }
 
 /**
- * @type {import('../bridge/types').BodyParser}
+ * @type {import('../bridge/types.js').BodyParser}
  */
 async function parseBody(body, contentType) {
   const bodyBytes = await streamToArrayBuffer(body)
@@ -133,7 +133,7 @@ async function parseBody(body, contentType) {
 
 /**
  * @param {import('aws-lambda').APIGatewayProxyEventV2} request 
- * @returns {import('../bridge/types').ParsedRequest}
+ * @returns {import('../bridge/types.js').ParsedRequest}
  */
 function parseAwsLambdaRequest(request) {
   const authSecretHeader = request.headers['x-auth-secret']
@@ -178,7 +178,7 @@ function serializeBridgeReceipts(receipts) {
 
 /**
  * 
- * @type {import('../bridge/types').TasksExecutor}
+ * @type {import('../bridge/types.js').TasksExecutor}
  */
 export async function invokeAndExecuteTasks(
   issuer, servicePrincipal, serviceURL, tasks, delegation
@@ -194,7 +194,7 @@ export async function invokeAndExecuteTasks(
     proofs: [delegation]
   }))
   /**
-   * @type {import('@ucanto/interface').ConnectionView<import('@web3-storage/upload-api').Service>}
+   * @type {import('@ucanto/interface').ConnectionView<import('@storacha/upload-api').Service>}
    */
   const connection = connect({
     id: servicePrincipal,
@@ -220,7 +220,7 @@ export async function invokeAndExecuteTasks(
  * see: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format
  *
  * @param {import('aws-lambda').APIGatewayProxyEventV2} request
- * @param {import('../bridge/types').BridgeRequestContext} context
+ * @param {import('../bridge/types.js').BridgeRequestContext} context
  */
 export async function handleBridgeRequest(request, context) {
   try {
@@ -321,7 +321,7 @@ function createBridgeHandler() {
   }
   const serviceURL = new URL(ACCESS_SERVICE_URL)
   /**
-   * @type {import('../bridge/types').BridgeRequestContext}
+   * @type {import('../bridge/types.js').BridgeRequestContext}
    */
   const context = {
     serviceDID,

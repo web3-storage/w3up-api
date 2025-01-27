@@ -2,13 +2,13 @@ import { encodeStr } from '../../data/egress.js'
 import { randomCustomer } from '../helpers/customer.js'
 import { randomEgressEvent } from '../helpers/egress.js'
 import retry from 'p-retry'
-import * as DidMailto from '@web3-storage/did-mailto'
+import * as DidMailto from '@storacha/did-mailto'
 
-/** @type {import('./api').TestSuite<import('./api').EgressTrafficTestContext>} */
+/** @type {import('./api.js').TestSuite<import('./api.js').EgressTrafficTestContext>} */
 export const test = {
   /**
    * @param {import('entail').assert} assert
-   * @param {import('./api').EgressTrafficTestContext} ctx
+   * @param {import('./api.js').EgressTrafficTestContext} ctx
    */
   'should process all the egress traffic events from the queue': async (assert, ctx) => {
     /** @type {string | null} */
@@ -31,7 +31,7 @@ export const test = {
 
       // 1. Add egress events to the queue to simulate egress traffic from the Freeway worker
       const maxEvents = 5
-      /** @type {import('../../lib/api').EgressTrafficData[]} */
+      /** @type {import('../../lib/api.js').EgressTrafficData[]} */
       const events = await Promise.all(
         Array.from(
           { length: maxEvents },

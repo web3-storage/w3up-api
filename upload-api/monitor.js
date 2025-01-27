@@ -6,7 +6,7 @@ import { sha256 } from 'multiformats/hashes/sha2'
 import { ScanCommand } from '@aws-sdk/client-dynamodb'
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import * as ed25519 from '@ucanto/principal/ed25519'
-import { webcrypto } from 'one-webcrypto'
+import { webcrypto } from '@storacha/one-webcrypto'
 
 const MAX_SAMPLE_SIZE = 10
 const SAMPLE_SIZE = 1

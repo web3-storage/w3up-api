@@ -2,14 +2,14 @@ import { testConsumerWithBucket as test } from './helpers/context.js'
 
 import { CBOR } from '@ucanto/core'
 import * as Signer from '@ucanto/principal/ed25519'
-import * as DealerCapabilities from '@web3-storage/capabilities/filecoin/dealer'
-import * as StoreCapabilities from '@web3-storage/capabilities/store'
-import { randomAggregate } from '@web3-storage/filecoin-api/test'
+import * as DealerCapabilities from '@storacha/capabilities/filecoin/dealer'
+import * as StoreCapabilities from '@storacha/capabilities/store'
+import { randomAggregate } from '@storacha/filecoin-api/test'
 
 import { updateAggregateAcceptTotal } from '../metrics.js'
 import { METRICS_NAMES, STREAM_TYPE } from '../constants.js'
 
-import { adminMetricsTableProps } from '@web3-storage/w3infra-upload-api/tables/index.js'
+import { adminMetricsTableProps } from '@storacha/upload-service-infra-upload-api/tables/index.js'
 import { createFilecoinMetricsTable } from '../store/metrics.js'
 import { createWorkflowStore } from '../store/workflow.js'
 
@@ -54,7 +54,7 @@ test('handles a batch of single invocation with aggregate/offer', async t => {
   const workflowStore = createWorkflowStore(REGION, bucketName, t.context.s3Opts)
 
   // Invocation ctx
-  const w3sService = await Signer.generate()
+  const storageService = await Signer.generate()
   const car = await randomCAR(128)
 
   // Generate aggregate for test
@@ -67,15 +67,15 @@ test('handles a batch of single invocation with aggregate/offer', async t => {
     value: {
         att: [
           DealerCapabilities.aggregateAccept.create({
-            with: w3sService.did(),
+            with: storageService.did(),
             nb: {
               aggregate: aggregate.link,
               pieces: piecesBlock.cid,
             }
           })
         ],
-        aud: w3sService.did(),
-          iss: w3sService.did()
+        aud: storageService.did(),
+        iss: storageService.did()
     },
     type: STREAM_TYPE.RECEIPT,
     out: {
@@ -108,7 +108,7 @@ test('handles a batch of single invocation with aggregate/accept', async t => {
   const workflowStore = createWorkflowStore(REGION, bucketName, t.context.s3Opts)
 
   // Invocation ctx
-  const w3sService = await Signer.generate()
+  const storageService = await Signer.generate()
   const car = await randomCAR(128)
 
   // Generate aggregate for test
@@ -121,15 +121,15 @@ test('handles a batch of single invocation with aggregate/accept', async t => {
     value: {
         att: [
           DealerCapabilities.aggregateAccept.create({
-            with: w3sService.did(),
+            with: storageService.did(),
             nb: {
               aggregate: aggregate.link,
               pieces: piecesBlock.cid,
             }
           })
         ],
-        aud: w3sService.did(),
-          iss: w3sService.did()
+        aud: storageService.did(),
+        iss: storageService.did()
     },
     type: STREAM_TYPE.RECEIPT,
     out: {
@@ -210,7 +210,7 @@ test('handles a batch of single invocation with aggregate/accept without receipt
   const workflowStore = createWorkflowStore(REGION, bucketName, t.context.s3Opts)
 
   // Invocation ctx
-  const w3sService = await Signer.generate()
+  const storageService = await Signer.generate()
   const car = await randomCAR(128)
 
   // Generate aggregate for test
@@ -223,15 +223,15 @@ test('handles a batch of single invocation with aggregate/accept without receipt
     value: {
         att: [
           DealerCapabilities.aggregateAccept.create({
-            with: w3sService.did(),
+            with: storageService.did(),
             nb: {
               aggregate: aggregate.link,
               pieces: piecesBlock.cid,
             }
           })
         ],
-        aud: w3sService.did(),
-          iss: w3sService.did()
+        aud: storageService.did(),
+        iss: storageService.did()
     },
     type: STREAM_TYPE.WORKFLOW,
     out: {
@@ -262,28 +262,28 @@ test('skips invocation with aggregate/accept if before start epoch ms', async t 
   const workflowStore = createWorkflowStore(REGION, bucketName, t.context.s3Opts)
 
   // Invocation ctx
-  const w3sService = await Signer.generate()
+  const storageService = await Signer.generate()
   const car = await randomCAR(128)
 
   // Generate aggregate for test
   const { pieces, aggregate } = await randomAggregate(100, 128)
   const offer = pieces.map((p) => p.link)
-      const piecesBlock = await CBOR.write(offer)
+  const piecesBlock = await CBOR.write(offer)
 
   const invocations = [{
     carCid: car.cid.toString(),
     value: {
         att: [
           DealerCapabilities.aggregateAccept.create({
-            with: w3sService.did(),
+            with: storageService.did(),
             nb: {
               aggregate: aggregate.link,
               pieces: piecesBlock.cid,
             }
           })
         ],
-        aud: w3sService.did(),
-          iss: w3sService.did()
+        aud: storageService.did(),
+        iss: storageService.did()
     },
     type: STREAM_TYPE.RECEIPT,
     out: {

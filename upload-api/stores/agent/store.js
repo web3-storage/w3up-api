@@ -6,7 +6,7 @@ import {
 import {
   RecordNotFound,
   StorageOperationFailed,
-} from '@web3-storage/upload-api/errors'
+} from '@storacha/upload-api/errors'
 import * as CAR from '@ucanto/transport/car'
 import { Invocation, parseLink, Receipt } from '@ucanto/core'
 import * as API from '../../types.js'

@@ -11,8 +11,8 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { getDynamoClient } from '../../lib/aws/dynamo.js'
 
 /**
- * @typedef {import('../types').ConsumerTable} ConsumerTable
- * @typedef {import('../types').ConsumerInput} ConsumerInput
+ * @typedef {import('../types.js').ConsumerTable} ConsumerTable
+ * @typedef {import('../types.js').ConsumerInput} ConsumerInput
  */
 
 /**
@@ -49,7 +49,7 @@ export class ConflictError extends Failure {
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName 
  * @param {import('@ucanto/interface').DID} consumer 
- * @returns {Promise<import('@web3-storage/upload-api').ProviderDID[]>}
+ * @returns {Promise<import('@storacha/upload-api').ProviderDID[]>}
  */
 async function getStorageProviders (dynamoDb, tableName, consumer) {
   const cmd = new QueryCommand({
@@ -68,7 +68,7 @@ async function getStorageProviders (dynamoDb, tableName, consumer) {
   // this list should not be longer than the default page size so this is not terribly urgent.
   return response.Items ? response.Items.map(item => {
     const row = unmarshall(item)
-    return /** @type {import('@web3-storage/upload-api').ProviderDID} */ (row.provider)
+    return /** @type {import('@storacha/upload-api').ProviderDID} */ (row.provider)
   }) : []
 }
 
@@ -82,7 +82,7 @@ export function useConsumerTable (dynamoDb, tableName) {
     /**
      * Get a consumer record.
      * 
-     * @param {import('@web3-storage/upload-api').ProviderDID} provider the provider whose records we should query
+     * @param {import('@storacha/upload-api').ProviderDID} provider the provider whose records we should query
      * @param {import('@ucanto/interface').DIDKey} consumer the consumer whose record we should return
      */
     get: async (provider, consumer) => {
@@ -107,7 +107,7 @@ export function useConsumerTable (dynamoDb, tableName) {
     /**
      * Get the consumer attached to a given subscription.
      * 
-     * @param {import('@web3-storage/upload-api').ProviderDID} provider 
+     * @param {import('@storacha/upload-api').ProviderDID} provider 
      * @param {string} subscription 
      * @returns 
      */

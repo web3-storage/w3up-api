@@ -17,7 +17,7 @@ export function UcanInvocationStack({ stack, app }) {
   // Setup app monitoring with Sentry
   setupSentry(app, stack)
 
-  const workflowBucket = new Bucket(stack, 'workflow-store', {
+  const agentMessageBucket = new Bucket(stack, 'workflow-store', {
     cors: true,
     cdk: {
       bucket: {
@@ -33,25 +33,19 @@ export function UcanInvocationStack({ stack, app }) {
     }
   })
   // Make bucket public for `s3:GetObject` command
-  workflowBucket.cdk.bucket.addToResourcePolicy(
+  agentMessageBucket.cdk.bucket.addToResourcePolicy(
     new PolicyStatement({
       actions: ['s3:GetObject'],
       effect: Effect.ALLOW,
       principals: [new StarPrincipal()],
-      resources: [workflowBucket.cdk.bucket.arnForObjects('*')],
+      resources: [agentMessageBucket.cdk.bucket.arnForObjects('*')],
     })
   )
 
-  const invocationBucket = new Bucket(stack, 'invocation-store', {
+  const agentIndexBucket = new Bucket(stack, 'invocation-store', {
     cors: true,
     cdk: {
       bucket: getBucketConfig('invocation-store', app.stage)
-    }
-  })
-  const taskBucket = new Bucket(stack, 'task-store', {
-    cors: true,
-    cdk: {
-      bucket: getBucketConfig('task-store', app.stage)
     }
   })
 
@@ -81,15 +75,13 @@ export function UcanInvocationStack({ stack, app }) {
   })
 
   stack.addOutputs({
-    workflowBucketName: workflowBucket.bucketName,
-    invocationBucketName: invocationBucket.bucketName,
-    taskBucketName: taskBucket.bucketName
+    agentMessageBucketName: agentMessageBucket.bucketName,
+    agentIndexBucketName: agentIndexBucket.bucketName,
   })
 
   return {
-    invocationBucket,
-    taskBucket,
-    workflowBucket,
+    agentIndexBucket,
+    agentMessageBucket,
     ucanStream
   }
 }

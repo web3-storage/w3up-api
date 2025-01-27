@@ -3,7 +3,7 @@ import { DecodeFailure, EncodeFailure, Schema } from './lib.js'
 
 /**
  * @typedef {import('../lib/api.js').StoreTable} StoreTable
- * @typedef {import('../lib/api').StoreTableSpaceInsertedAtIndex} StoreTableSpaceInsertedAtIndex
+ * @typedef {import('../lib/api.js').StoreTableSpaceInsertedAtIndex} StoreTableSpaceInsertedAtIndex
  * @typedef {import('../types.js').InferStoreRecord<StoreTable>} StoreTableStoreRecord
  * @typedef {import('../lib/api.js').StoreTableKey} StoreTableKey
  * @typedef {import('../lib/api.js').StoreTableListKey} StoreTableListKey

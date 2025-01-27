@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/serverless'
-import * as UploadAPI from '@web3-storage/upload-api'
+import * as UploadAPI from '@storacha/upload-api'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,

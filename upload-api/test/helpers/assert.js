@@ -1,7 +1,7 @@
 /**
  * 
  * @param {import("ava").ExecutionContext} t 
- * @returns {import("@web3-storage/upload-api").Assert}
+ * @returns {import("@storacha/upload-api").Assert}
  */
 export function assertsFromExecutionContext(t){
   return {

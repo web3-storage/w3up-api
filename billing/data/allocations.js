@@ -2,14 +2,14 @@ import * as Link from 'multiformats/link'
 import { DecodeFailure, EncodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').Allocation} Allocation
- * @typedef {import('../lib/api').AllocationSpaceInsertedAtIndex} AllocationSpaceInsertedAtIndex
- * @typedef {import('../types').InferStoreRecord<Allocation>} AllocationStoreRecord
- * @typedef {import('../lib/api').AllocationKey} AllocationKey
- * @typedef {import('../lib/api').AllocationListKey} AllocationListKey
- * @typedef {import('../types').InferStoreRecord<AllocationKey>} AllocationKeyStoreRecord
+ * @typedef {import('../lib/api.js').Allocation} Allocation
+ * @typedef {import('../lib/api.js').AllocationSpaceInsertedAtIndex} AllocationSpaceInsertedAtIndex
+ * @typedef {import('../types.js').InferStoreRecord<Allocation>} AllocationStoreRecord
+ * @typedef {import('../lib/api.js').AllocationKey} AllocationKey
+ * @typedef {import('../lib/api.js').AllocationListKey} AllocationListKey
+ * @typedef {import('../types.js').InferStoreRecord<AllocationKey>} AllocationKeyStoreRecord
  * @typedef {{ space: string, insertedAt?: string }} AllocationListStoreRecord
- * @typedef {import('../types').StoreRecord} StoreRecord
+ * @typedef {import('../types.js').StoreRecord} StoreRecord
  */
 
 const schema = Schema.struct({
@@ -20,13 +20,13 @@ const schema = Schema.struct({
   size: Schema.bigint().greaterThanEqualTo(0n),
 })
 
-/** @type {import('../lib/api').Validator<Allocation>} */
+/** @type {import('../lib/api.js').Validator<Allocation>} */
 export const validate = (input) => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<AllocationKey, AllocationKeyStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<AllocationKey, AllocationKeyStoreRecord>} */
 export const encodeKey = (input) => ({ ok: { multihash: input.multihash } })
 
-/** @type {import('../lib/api').Encoder<Allocation, AllocationStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<Allocation, AllocationStoreRecord>} */
 export const encode = (input) => {
   try {
     return {
@@ -47,7 +47,7 @@ export const encode = (input) => {
   }
 }
 
-/** @type {import('../lib/api').Decoder<StoreRecord, Allocation>} */
+/** @type {import('../lib/api.js').Decoder<StoreRecord, Allocation>} */
 export const decode = (input) => {
   try {
     return {
@@ -69,7 +69,7 @@ export const decode = (input) => {
 }
 
 export const lister = {
-  /** @type {import('../lib/api').Encoder<AllocationListKey, AllocationListStoreRecord>} */
+  /** @type {import('../lib/api.js').Encoder<AllocationListKey, AllocationListStoreRecord>} */
   encodeKey: (input) => {
     /** @type  AllocationListStoreRecord */
     const conditions = { space: input.space.toString() }
@@ -82,7 +82,7 @@ export const lister = {
       },
     }
   },
-  /** @type {import('../lib/api').Decoder<StoreRecord, AllocationSpaceInsertedAtIndex>} */
+  /** @type {import('../lib/api.js').Decoder<StoreRecord, AllocationSpaceInsertedAtIndex>} */
   decode: (input) => {
     try {
       return {

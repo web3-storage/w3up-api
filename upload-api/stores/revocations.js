@@ -33,7 +33,7 @@ const staticRevocationKeys = new Set(Object.keys(revocationTableProps?.fields ||
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('@web3-storage/upload-api').RevocationsStorage}
+ * @returns {import('@storacha/upload-api').RevocationsStorage}
  */
 export function useRevocationsTable (dynamoDb, tableName) {
   return {
@@ -113,7 +113,7 @@ export function useRevocationsTable (dynamoDb, tableName) {
           }
         }
         return m
-      }, /** @type {import('@web3-storage/upload-api').MatchingRevocations} */({}))
+      }, /** @type {import('@storacha/upload-api').MatchingRevocations} */({}))
       return { ok: revocations }
     }
   }

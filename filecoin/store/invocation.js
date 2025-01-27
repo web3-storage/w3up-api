@@ -21,7 +21,7 @@ export function createInvocationStore(region, bucketName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-s3').S3Client} s3client
  * @param {string} bucketName
- * @returns {import('../types').InvocationBucket}
+ * @returns {import('../types.js').InvocationBucket}
  */
 export const useInvocationStore = (s3client, bucketName) => {
   const store = Store.open({

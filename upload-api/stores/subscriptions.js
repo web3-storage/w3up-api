@@ -1,7 +1,7 @@
 /**
  * @param {object} conf
  * @param {import('../types.js').ConsumerTable} conf.consumerTable
- * @returns {import('@web3-storage/upload-api').SubscriptionsStorage}
+ * @returns {import('@storacha/upload-api').SubscriptionsStorage}
  */
 export function useSubscriptionsStore({ consumerTable }) {
   return {
@@ -15,7 +15,7 @@ export function useSubscriptionsStore({ consumerTable }) {
         subs[consumer.subscription].push(consumer)
       }
 
-      /** @type {import('@web3-storage/upload-api').SubscriptionListItem[]} */
+      /** @type {import('@storacha/upload-api').SubscriptionListItem[]} */
       const subscriptions = []
       for (const [subscription, consumers] of Object.entries(subs)) {
         subscriptions.push({

@@ -6,6 +6,7 @@ import { getS3Client } from '../../lib/aws/s3.js'
 /**
  * Abstraction layer with Factory to perform operations on bucket storing CAR files.
  *
+ * @deprecated
  * @param {string} region
  * @param {string} bucketName
  * @param {Partial<import('../../lib/aws/s3.js').Address>} [options]
@@ -19,14 +20,15 @@ export function createCarStore(region, bucketName, options) {
 }
 
 /**
+ * @deprecated
  * @param {import('@aws-sdk/client-s3').S3Client} s3
  * @param {string} bucketName
- * @returns {import('../types').CarStore}
+ * @returns {import('../types.js').CarStore}
  */
 export function useCarStore(s3, bucketName) {
   return {
     /**
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').UnknownLink} link
      */
     has: async (link) => {
       const cmd = new HeadObjectCommand({
@@ -49,7 +51,7 @@ export function useCarStore(s3, bucketName) {
      * Create a presigned s3 url allowing the recipient to upload
      * only the CAR that matches the provided Link
      *
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').UnknownLink} link
      * @param {number} size
      */
     createUploadUrl: async (link, size) => {
@@ -105,6 +107,7 @@ export function useCarStore(s3, bucketName) {
  * store#createUploadUrl is from first store.
  * store#has will check stores in order until 0-1 `true` are found.
  * 
+ * @deprecated
  * @template {import('@web3-storage/upload-api').CarStoreBucket} T
  * @param {T} carStore
  * @param {T[]} moreCarStores

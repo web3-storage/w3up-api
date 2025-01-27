@@ -5,11 +5,11 @@ import { randomCustomer } from '../helpers/customer.js'
 import { collectQueueMessages } from '../helpers/queue.js'
 import { randomSubscription } from '../helpers/subscription.js'
 
-/** @type {import('./api').TestSuite<import('./api').CustomerBillingQueueTestContext>} */
+/** @type {import('./api.js').TestSuite<import('./api.js').CustomerBillingQueueTestContext>} */
 export const test = {
   'should queue all spaces for a customer': async (/** @type {import('entail').assert} */ assert, ctx) => {
     const customer = randomCustomer()
-    const provider = 'did:web:web3.storage'
+    const provider = 'did:web:up.storacha.network'
 
     const consumers = await Promise.all([
       randomConsumer({ provider }),

@@ -1,5 +1,5 @@
 {
-  "name": "@web3-storage/w3infra-indexer",
+  "name": "@storacha/upload-service-infra-indexer",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -10,9 +10,9 @@
     "@aws-sdk/client-sqs": "^3.600.0",
     "@aws-sdk/util-dynamodb": "^3.602.0",
     "@ipld/dag-json": "^10.2.1",
+    "@storacha/one-webcrypto": "^1.0.1",
     "@ucanto/interface": "^10.0.1",
     "multiformats": "^13.1.1",
-    "one-webcrypto": "^1.0.3",
     "p-map": "^7.0.2",
     "p-retry": "^6.2.0"
   },

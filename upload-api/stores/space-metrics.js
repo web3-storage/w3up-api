@@ -22,14 +22,14 @@ export function createMetricsTable (region, tableName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('../types').SpaceMetricsStore}
+ * @returns {import('../types.js').SpaceMetricsStore}
  */
 export function useMetricsTable (dynamoDb, tableName) {
   return {
     /**
      * Increment total values of the given metrics.
      *
-     * @param {Record<string, import('../types').SpaceMetricsItem[]>} metricsToUpdate
+     * @param {Record<string, import('../types.js').SpaceMetricsItem[]>} metricsToUpdate
      */
     incrementTotals: async (metricsToUpdate) => {
       const transactItems = Object.entries(metricsToUpdate).map(([name, items]) => items.map((item) => ({

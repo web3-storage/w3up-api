@@ -14,7 +14,7 @@ import { fromString } from 'uint8arrays/from-string'
  * Replicate object from event target to destination bucket.
  *
  * @param {object} props
- * @param {import('./utils/parse-sqs-event').EventRecord} props.record
+ * @param {import('./utils/parse-sqs-event.js').EventRecord} props.record
  * @param {S3Client} props.destinationBucket
  * @param {S3Client} props.originBucket
  * @param {string} props.destinationBucketName

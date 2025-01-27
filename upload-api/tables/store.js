@@ -14,12 +14,13 @@ import { getDynamoClient } from '../../lib/aws/dynamo.js'
  * @typedef {import('@web3-storage/upload-api').StoreTable} StoreTable
  * @typedef {import('@web3-storage/upload-api').StoreAddInput} StoreAddInput
  * @typedef {import('@web3-storage/upload-api').StoreAddOutput} StoreAddOutput
- * @typedef {import('@web3-storage/upload-api').StoreListItem} StoreListItem
+ * @typedef {import('@storacha/upload-api').StoreListItem} StoreListItem
  */
 
 /**
  * Abstraction layer to handle operations on Store Table.
  *
+ * @deprecated
  * @param {string} region
  * @param {string} tableName
  * @param {object} [options]
@@ -36,6 +37,7 @@ export function createStoreTable(region, tableName, options = {}) {
 }
 
 /**
+ * @deprecated
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
  * @returns {StoreTable}
@@ -46,7 +48,7 @@ export function useStoreTable(dynamoDb, tableName) {
      * Check if the given link CID is bound to the uploader account
      *
      * @param {import('@ucanto/interface').DID} space
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').UnknownLink} link
      * @returns {ReturnType<StoreTable['exists']>}
      */
     exists: async (space, link) => {
@@ -105,7 +107,7 @@ export function useStoreTable(dynamoDb, tableName) {
      * Unbinds a link CID to an account
      *
      * @param {import('@ucanto/interface').DID} space
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').UnknownLink} link
      * @returns {ReturnType<StoreTable['remove']>}
      */
     remove: async (space, link) => {
@@ -139,7 +141,7 @@ export function useStoreTable(dynamoDb, tableName) {
      * List all CARs bound to an account
      *
      * @param {import('@ucanto/interface').DID} space
-     * @param {import('@web3-storage/upload-api').ListOptions} [options]
+     * @param {import('@storacha/upload-api').ListOptions} [options]
      * @returns {ReturnType<StoreTable['list']>}
      */
     list: async (space, options = {}) => {
@@ -187,8 +189,8 @@ export function useStoreTable(dynamoDb, tableName) {
       }
     },
     /**
-     * @param {import('@web3-storage/upload-api').DID} space
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').DID} space
+     * @param {import('@storacha/upload-api').UnknownLink} link
      * @returns {ReturnType<StoreTable['get']>}
      */
     async get(space, link) {
@@ -221,7 +223,7 @@ export function useStoreTable(dynamoDb, tableName) {
     /**
      * Get information about a CID.
      * 
-     * @param {import('@web3-storage/upload-api').UnknownLink} link
+     * @param {import('@storacha/upload-api').UnknownLink} link
      * @returns {ReturnType<StoreTable['inspect']>}
      */
     inspect: async (link) => {

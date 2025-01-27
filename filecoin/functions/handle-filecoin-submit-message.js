@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/serverless'
 
-import * as storefrontEvents from '@web3-storage/filecoin-api/storefront/events'
+import * as storefrontEvents from '@storacha/filecoin-api/storefront/events'
 
 import { createPieceTable } from '../store/piece.js'
 import { useContentStore } from '../store/content.js'

@@ -4,7 +4,7 @@ import * as Delegation from '@ucanto/core/delegation'
 import { fromString } from 'uint8arrays/from-string'
 import * as DID from '@ipld/dag-ucan/did'
 
-import * as storefrontEvents from '@web3-storage/filecoin-api/storefront/events'
+import * as storefrontEvents from '@storacha/filecoin-api/storefront/events'
 
 import { decodeMessage } from '../queue/piece-offer-queue.js'
 import { getServiceConnection, getServiceSigner } from '../service.js'
