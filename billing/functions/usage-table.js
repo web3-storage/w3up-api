@@ -5,6 +5,9 @@ import Stripe from 'stripe'
 import Big from 'big.js'
 import * as Usage from '../data/usage.js'
 import { expect } from './lib.js'
+import { CID } from 'multiformats/cid'
+import * as raw from 'multiformats/codecs/raw'
+import { sha256 } from 'multiformats/hashes/sha2'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
@@ -69,6 +72,15 @@ const parseUsageInsertEvent = event => {
 }
 
 /**
+ * @param {import('../lib/api.js').Usage} usage 
+ */
+async function createIdempotencyKey(usage){
+  const digest = await sha256.digest(new TextEncoder().encode(`${usage.from.toISOString()}-${usage.to.toISOString()}/${usage.customer}/${usage.provider}/${usage.space}`))
+  const cid = CID.create(1, raw.code, digest)
+  return cid.toString()
+}
+
+/**
  * Reports usage to Stripe. Note we use an `idempotencyKey` but this is only
  * retained by Stripe for 24 hours. Thus, retries should not be attempted for
  * the same usage record after 24 hours. The default DynamoDB stream retention
@@ -114,7 +126,7 @@ const reportUsage = async (usage, ctx) => {
 
   const duration = usage.to.getTime() - usage.from.getTime()
   const quantity = Math.floor(new Big(usage.usage.toString()).div(duration).div(1024 * 1024 * 1024).toNumber())
-  const idempotencyKey = `${usage.from.toISOString()}-${usage.to.toISOString()}/${usage.customer}/${usage.provider}/${usage.space}`
+  const idempotencyKey = await createIdempotencyKey(usage)
   const usageRecord = await ctx.stripe.subscriptionItems.createUsageRecord(
     subItem.id,
     { quantity, action: 'increment' },
