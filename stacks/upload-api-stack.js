@@ -146,6 +146,7 @@ export function UploadApiStack({ stack, app }) {
             INDEXING_SERVICE_URL,
             INDEXING_SERVICE_PROOF,
             HOSTED_ZONE: hostedZone ?? '',
+            PRINCIPAL_MAPPING: process.env.PRINCIPAL_MAPPING ?? ''
           },
           bind: [
             privateKey,

@@ -149,6 +149,7 @@ export async function ucanInvocationRouter(request) {
     filecoinSubmitQueueUrl,
     egressTrafficQueueUrl,
     requirePaymentPlan,
+    principalMapping,
     // set for testing
     dbEndpoint,
     accessServiceURL,
@@ -251,8 +252,8 @@ export async function ucanInvocationRouter(request) {
     registry: allocationBlobRegistry,
     blobRetriever,
     resolveDIDKey: (did) =>
-      Schema.did({ method: 'web' }).is(did) && knownWebDIDs[did]
-        ? ok(knownWebDIDs[did])
+      Schema.did({ method: 'web' }).is(did) && principalMapping[did]
+        ? ok(principalMapping[did])
         : error(new DIDResolutionError(did)),
     // TODO: to be deprecated with `store/*` protocol
     storeTable: createStoreTable(AWS_REGION, storeTableName, {
@@ -371,6 +372,9 @@ function getLambdaEnv () {
     carparkBucketAccessKeyId: mustGetEnv('R2_ACCESS_KEY_ID'),
     carparkBucketSecretAccessKey: mustGetEnv('R2_SECRET_ACCESS_KEY'),
     sstStage: mustGetEnv('SST_STAGE'),
+    principalMapping:
+      /** @type {Record<`did:web:${string}`, `did:key:${string}`>} */
+      ({ ...knownWebDIDs, ...JSON.parse(process.env.PRINCIPAL_MAPPING || '{}') }),
     // set for testing
     dbEndpoint: process.env.DYNAMO_DB_ENDPOINT,
   }

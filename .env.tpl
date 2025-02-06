@@ -54,5 +54,8 @@ STRIPE_BILLING_METER_EVENT_NAME = ''
 REQUIRE_PAYMENT_PLAN = 'true'
 
 # Referrals
-
 REFERRALS_ENDPOINT = 'https://staging.referrals.storacha.network'
+
+# Optional - custom principal resolution mappings
+# JSON encoded mapping of did:web to did:key
+PRINCIPAL_MAPPING = '{"did:web:example.com":"did:key:z6MktkCXwNmpqejQxYd7JHPcw7d4Srjct7sX74VLfKqsPyAw"}'

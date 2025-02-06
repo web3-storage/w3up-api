@@ -212,6 +212,10 @@ Bucket name to replicate written CAR files.
 
 Bucket name where delegations are stored.
 
+#### `PRINCIPAL_MAPPING`
+
+Optional - custom principal resolution mappings. JSON encoded mapping of did:web to did:key.
+
 #### `PROVIDERS`
 
 A comma-separated string of ServiceDIDs in use.
