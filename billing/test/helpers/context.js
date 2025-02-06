@@ -148,24 +148,6 @@ export const createStripeTestContext = async () => {
   return { customerStore }
 }
 
-export const createUCANStreamTestContext = async () => {
-  await createAWSServices()
-
-  const spaceDiffTableName = await createTable(awsServices.dynamo.client, spaceDiffTableProps, 'space-diff-')
-  const spaceDiffStore = createSpaceDiffStore(awsServices.dynamo.client, { tableName: spaceDiffTableName })
-  const consumerTableName = await createTable(awsServices.dynamo.client, consumerTableProps, 'consumer-')
-  const consumerStore = {
-    ...createConsumerStore(awsServices.dynamo.client, { tableName: consumerTableName }),
-    ...createStorePutterClient(awsServices.dynamo.client, {
-      tableName: consumerTableName,
-      validate: validateConsumer, // assume test data is valid
-      encode: encodeConsumer
-    })
-  }
-
-  return { consumerStore, spaceDiffStore }
-}
-
 /**
  * @returns {Promise<import('../lib/api.js').EgressTrafficTestContext>}
  */

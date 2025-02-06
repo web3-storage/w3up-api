@@ -20,7 +20,7 @@
     "@storacha/did-mailto": "^1.0.1",
     "@storacha/indexing-service-client": "^2.0.0",
     "@storacha/one-webcrypto": "^1.0.1",
-    "@storacha/upload-api": "^1.3.2",
+    "@storacha/upload-api": "^1.3.3",
     "@ucanto/client": "^9.0.1",
     "@ucanto/core": "^10.2.1",
     "@ucanto/interface": "^10.1.1",

@@ -1,7 +1,6 @@
 import { use, Cron, Queue, Function, Config, Api } from 'sst/constructs'
-import { StartingPosition, FilterCriteria, FilterRule } from 'aws-cdk-lib/aws-lambda'
+import { StartingPosition } from 'aws-cdk-lib/aws-lambda'
 import { Duration } from 'aws-cdk-lib'
-import { UcanInvocationStack } from './ucan-invocation-stack.js'
 import { BillingDbStack } from './billing-db-stack.js'
 import { UploadDbStack } from './upload-db-stack.js'
 import { setupSentry, getCustomDomain } from './config.js'
@@ -89,39 +88,6 @@ export function BillingStack ({ stack, app }) {
   const billingCron = new Cron(stack, 'billing-cron', {
     job: billingCronHandler,
     schedule: 'cron(0 0 28 * ? *)' // https://crontab.guru/#0_0_1_*_*
-  })
-
-  const { ucanStream } = use(UcanInvocationStack)
-
-  // Lambda that receives UCAN stream events and writes diffs to spaceSizeDiffTable
-  const ucanStreamHandler = new Function(stack, 'ucan-stream-handler', {
-    permissions: [spaceDiffTable, consumerTable],
-    handler: 'billing/functions/ucan-stream.handler',
-    environment: {
-      SPACE_DIFF_TABLE_NAME: spaceDiffTable.tableName,
-      CONSUMER_TABLE_NAME: consumerTable.tableName
-    }
-  })
-
-  ucanStream.addConsumers(stack, {
-    ucanStreamHandler: {
-      function: ucanStreamHandler,
-      cdk: {
-        eventSource: {
-          batchSize: 25, // max dynamo BatchWriteItems size
-          bisectBatchOnError: true,
-          startingPosition: StartingPosition.LATEST,
-          filters: [
-            FilterCriteria.filter({
-              data: {
-                type: FilterRule.isEqual('receipt')
-              }
-            })
-          ],
-          parallelizationFactor: 10
-        },
-      }
-    }
   })
 
   // Lambda that sends usage table records to Stripe for invoicing.

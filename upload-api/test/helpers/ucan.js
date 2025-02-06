@@ -37,6 +37,7 @@ import { create as createStorageProvider } from './external-services/storage-pro
 import { create as createBlobRetriever } from '../../external-services/blob-retriever.js'
 import { create as createIndexingServiceClient } from './external-services/indexing-service.js'
 import { useStorageProviderTable } from '../../tables/storage-provider.js'
+import { spaceDiffTableProps } from '@storacha/upload-service-infra-billing/tables/space-diff.js'
 
 export { API }
 
@@ -235,9 +236,12 @@ export async function executionContextToUcantoTestServerContext(t) {
     space: useSpaceMetricsStore(dynamo, spaceMetricsTableName),
     admin: useAdminMetricsStore(dynamo, adminMetricsTableName)
   }
+  const consumerTableName = await createTable(dynamo, consumerTableProps)
   const blobRegistry = useBlobRegistry(
     dynamo,
     await createTable(dynamo, blobRegistryTableProps),
+    await createTable(dynamo, spaceDiffTableProps),
+    consumerTableName,
     metrics
   )
   const allocationTableName = await createTable(dynamo, allocationTableProps)
@@ -297,7 +301,7 @@ export async function executionContextToUcantoTestServerContext(t) {
   );
   const consumerTable = useConsumerTable(
     dynamo,
-    await createTable(dynamo, consumerTableProps)
+    consumerTableName
   );
   const spaceMetricsTable = useSpaceMetricsTable(
     dynamo,

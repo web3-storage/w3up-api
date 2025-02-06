@@ -336,8 +336,6 @@ export interface UcanWorkflowMessage<C extends Capabilities = Capabilities> exte
   type: 'workflow'
 }
 
-export type UcanStreamMessage<C extends Capabilities = Capabilities> = UcanWorkflowMessage<C> | UcanReceiptMessage<C>
-
 // Utility ////////////////////////////////////////////////////////////////////
 
 export type ConsumerDID = DID

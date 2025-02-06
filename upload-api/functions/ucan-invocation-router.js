@@ -195,7 +195,7 @@ export async function ucanInvocationRouter(request) {
     },
   })
 
-  const blobRegistry = createBlobRegistry(AWS_REGION, blobRegistryTableName, metrics, options)
+  const blobRegistry = createBlobRegistry(AWS_REGION, blobRegistryTableName, spaceDiffTableName, consumerTableName, metrics, options)
   const allocationBlobRegistry = createAllocationTableBlobRegistry(blobRegistry, AWS_REGION, allocationTableName, options)
   const delegationBucket = createDelegationsStore(r2DelegationBucketEndpoint, r2DelegationBucketAccessKeyId, r2DelegationBucketSecretAccessKey, r2DelegationBucketName)
   const subscriptionTable = createSubscriptionTable(AWS_REGION, subscriptionTableName, options)

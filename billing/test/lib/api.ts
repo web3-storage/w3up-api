@@ -47,12 +47,6 @@ export interface StripeTestContext {
   customerStore: CustomerStore
 }
 
-export interface UCANStreamTestContext {
-  spaceDiffStore: SpaceDiffStore
-  consumerStore: ConsumerStore & StorePutter<Consumer>
-}
-
-
 export interface EgressTrafficTestContext extends Context {
   egressTrafficQueue: EgressTrafficQueue & QueueRemover<EgressTrafficData>
   egressTrafficQueueUrl: string
@@ -74,7 +68,6 @@ export type TestContext =
   & CustomerBillingQueueTestContext
   & SpaceBillingQueueTestContext
   & StripeTestContext
-  & UCANStreamTestContext
   & EgressTrafficTestContext
 
 /** QueueRemover can remove items from the head of the queue. */
