@@ -249,6 +249,9 @@ declare module 'sst/node/config' {
     },
     STRIPE_SECRET_KEY: {
       value: string
+    },
+    INDEXING_SERVICE_PROOF: {
+      value: string
     }
   }
 }

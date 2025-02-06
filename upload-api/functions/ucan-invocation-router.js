@@ -167,7 +167,7 @@ export async function ucanInvocationRouter(request) {
   }
 
   const { UPLOAD_API_DID } = process.env
-  const { PRIVATE_KEY, STRIPE_SECRET_KEY } = Config
+  const { PRIVATE_KEY, STRIPE_SECRET_KEY, INDEXING_SERVICE_PROOF } = Config
   const serviceSigner = getServiceSigner({ did: UPLOAD_API_DID, privateKey: PRIVATE_KEY })
 
   const options = { endpoint: dbEndpoint }
@@ -223,9 +223,8 @@ export async function ucanInvocationRouter(request) {
 
   const indexingServicePrincipal = DID.parse(mustGetEnv('INDEXING_SERVICE_DID'))
   const indexingServiceURL = new URL(mustGetEnv('INDEXING_SERVICE_URL'))
-  const indexingServiceProof = mustGetEnv('INDEXING_SERVICE_PROOF')
 
-  const cid = Link.parse(indexingServiceProof, base64)
+  const cid = Link.parse(INDEXING_SERVICE_PROOF, base64)
   const proof = await Delegation.extract(cid.multihash.digest)
   if (!proof.ok) throw new Error('failed to extract proof', { cause: proof.error })
 

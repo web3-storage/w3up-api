@@ -30,6 +30,9 @@ export function UploadDbStack({ stack, app }) {
   // Upload API private key
   const privateKey = new Config.Secret(stack, 'PRIVATE_KEY')
 
+  // Not strictly a secret, but it makes the env vars exceed the 4kb limit...
+  const indexingServiceProof = new Config.Secret(stack, 'INDEXING_SERVICE_PROOF')
+
   /**
    * The allocation table tracks allocated multihashes per space.
    * Used by the blob/* service capabilities.
@@ -130,5 +133,6 @@ export function UploadDbStack({ stack, app }) {
     spaceMetricsTable,
     storageProviderTable,
     privateKey,
+    indexingServiceProof,
   }
 }

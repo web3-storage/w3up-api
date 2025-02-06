@@ -23,8 +23,8 @@ Sentry.AWSLambda.init({
  * @param {import('aws-lambda').DynamoDBStreamEvent} event
  */
 async function pieceCidReport (event) {
-  const { indexingServiceDid, indexingServiceUrl, indexingServiceProof } = getEnv()
-  const { PRIVATE_KEY: privateKey } = Config
+  const { indexingServiceDid, indexingServiceUrl } = getEnv()
+  const { PRIVATE_KEY: privateKey, INDEXING_SERVICE_PROOF: indexingServiceProof } = Config
 
   const records = parseDynamoDbEvent(event)
   if (records.length > 1) {
@@ -80,7 +80,6 @@ function getEnv() {
   return {
     indexingServiceDid: mustGetEnv('INDEXING_SERVICE_DID'),
     indexingServiceUrl: mustGetEnv('INDEXING_SERVICE_URL'),
-    indexingServiceProof: mustGetEnv('INDEXING_SERVICE_PROOF'),
   }
 }
 

@@ -25,7 +25,6 @@ export function FilecoinStack({ stack, app }) {
     AGGREGATOR_URL,
     INDEXING_SERVICE_DID,
     INDEXING_SERVICE_URL,
-    INDEXING_SERVICE_PROOF,
     DISABLE_PIECE_CID_COMPUTE,
     UPLOAD_API_DID,
     STOREFRONT_PROOF,
@@ -41,7 +40,7 @@ export function FilecoinStack({ stack, app }) {
   // Get eventBus reference
   const { eventBus } = use(BusStack)
   // Get store table reference
-  const { pieceTable, privateKey, adminMetricsTable } = use(UploadDbStack)
+  const { pieceTable, privateKey, adminMetricsTable, indexingServiceProof } = use(UploadDbStack)
   // Get UCAN store references
   const { agentMessageBucket, agentIndexBucket, ucanStream } = use(UcanInvocationStack)
   const { roundaboutApiUrl } = use(RoundaboutStack)
@@ -152,11 +151,11 @@ export function FilecoinStack({ stack, app }) {
         environment: {
           INDEXING_SERVICE_DID,
           INDEXING_SERVICE_URL,
-          INDEXING_SERVICE_PROOF,
         },
         timeout: 3 * 60,
         bind: [
-          privateKey
+          privateKey,
+          indexingServiceProof
         ]
       },
       deadLetterQueue: pieceTableHandleInserToClaimtDLQ.cdk.queue,

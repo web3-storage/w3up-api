@@ -35,7 +35,6 @@ export function UploadApiStack({ stack, app }) {
     AGGREGATOR_DID,
     INDEXING_SERVICE_DID,
     INDEXING_SERVICE_URL,
-    INDEXING_SERVICE_PROOF,
   } = getEnv()
 
   // Setup app monitoring with Sentry
@@ -43,7 +42,7 @@ export function UploadApiStack({ stack, app }) {
 
   // Get references to constructs created in other stacks
   const { carparkBucket } = use(CarparkStack)
-  const { allocationTable, blobRegistryTable, storeTable, uploadTable, delegationBucket, delegationTable, revocationTable, adminMetricsTable, spaceMetricsTable, consumerTable, subscriptionTable, storageProviderTable, rateLimitTable, pieceTable, privateKey } = use(UploadDbStack)
+  const { allocationTable, blobRegistryTable, storeTable, uploadTable, delegationBucket, delegationTable, revocationTable, adminMetricsTable, spaceMetricsTable, consumerTable, subscriptionTable, storageProviderTable, rateLimitTable, pieceTable, privateKey, indexingServiceProof } = use(UploadDbStack)
   const { agentIndexBucket, agentMessageBucket, ucanStream } = use(UcanInvocationStack)
   const { customerTable, spaceDiffTable, spaceSnapshotTable, egressTrafficTable, stripeSecretKey } = use(BillingDbStack)
   const { pieceOfferQueue, filecoinSubmitQueue } = use(FilecoinStack)
@@ -144,7 +143,6 @@ export function UploadApiStack({ stack, app }) {
             REFERRALS_ENDPOINT: process.env.REFERRALS_ENDPOINT ?? '',
             INDEXING_SERVICE_DID,
             INDEXING_SERVICE_URL,
-            INDEXING_SERVICE_PROOF,
             HOSTED_ZONE: hostedZone ?? '',
             PRINCIPAL_MAPPING: process.env.PRINCIPAL_MAPPING ?? ''
           },
@@ -152,6 +150,7 @@ export function UploadApiStack({ stack, app }) {
             privateKey,
             ucanInvocationPostbasicAuth,
             stripeSecretKey,
+            indexingServiceProof,
           ]
         }
       },
