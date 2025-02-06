@@ -39,7 +39,7 @@ export class EncodeFailure extends Failure {
  * @template [I=unknown]
  * @extends {Validator.Schema.API<bigint, I>}
  */
-class BigIntSchema extends Validator.Schema.API {
+export class BigIntSchema extends Validator.Schema.API {
   /**
    * @param {I} input
    */
@@ -65,7 +65,7 @@ class BigIntSchema extends Validator.Schema.API {
  * @template {bigint} T
  * @extends {Validator.Schema.API<T, T, bigint>}
  */
-class GreaterThanEqualTo extends Validator.Schema.API {
+export class GreaterThanEqualTo extends Validator.Schema.API {
   /**
    * @param {T} input
    * @param {bigint} number
@@ -86,7 +86,7 @@ class GreaterThanEqualTo extends Validator.Schema.API {
  * @template [I=unknown]
  * @extends {Validator.Schema.API<Date, I>}
  */
-class DateSchema extends Validator.Schema.API {
+export class DateSchema extends Validator.Schema.API {
   /**
    * @param {I} input
    */

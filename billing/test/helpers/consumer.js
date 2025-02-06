@@ -5,12 +5,12 @@ import { randomDID } from './did.js'
 import { randomInteger } from './math.js'
 
 /**
- * @param {Partial<import('../../lib/api').Consumer>} [base]
- * @returns {Promise<import('../../lib/api').Consumer>}
+ * @param {Partial<import('../../lib/api.js').Consumer>} [base]
+ * @returns {Promise<import('../../lib/api.js').Consumer>}
  */
 export const randomConsumer = async (base = {}) => ({
   consumer: await randomDID(),
-  provider: Schema.did({ method: 'web' }).from(['did:web:web3.storage', 'did:web:nft.storage'][randomInteger(0, 2)]),
+  provider: Schema.did({ method: 'web' }).from(['did:web:up.storacha.network', 'did:web:web3.storage', 'did:web:nft.storage'][randomInteger(0, 2)]),
   subscription: randomLink().toString(),
   customer: randomCustomer().customer,
   cause: randomLink(),

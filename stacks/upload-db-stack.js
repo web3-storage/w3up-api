@@ -2,6 +2,7 @@ import { Table, Bucket, Config } from 'sst/constructs'
 
 import {
   allocationTableProps,
+  blobRegistryTableProps,
   storeTableProps,
   uploadTableProps,
   consumerTableProps,
@@ -10,7 +11,8 @@ import {
   revocationTableProps,
   rateLimitTableProps,
   adminMetricsTableProps,
-  spaceMetricsTableProps
+  spaceMetricsTableProps,
+  storageProviderTableProps
 } from '../upload-api/tables/index.js'
 import {
   pieceTableProps
@@ -28,15 +30,20 @@ export function UploadDbStack({ stack, app }) {
   // Upload API private key
   const privateKey = new Config.Secret(stack, 'PRIVATE_KEY')
 
-  // Content claims private key
-  // TODO: we should look into creating a trust layer for content claims
-  const contentClaimsPrivateKey = new Config.Secret(stack, 'CONTENT_CLAIMS_PRIVATE_KEY')
+  // Not strictly a secret, but it makes the env vars exceed the 4kb limit...
+  const indexingServiceProof = new Config.Secret(stack, 'INDEXING_SERVICE_PROOF')
 
   /**
    * The allocation table tracks allocated multihashes per space.
    * Used by the blob/* service capabilities.
    */
   const allocationTable = new Table(stack, 'allocation', allocationTableProps)
+
+  /**
+   * The blob registry table contains information about blob registrations
+   * per space.
+   */
+  const blobRegistryTable = new Table(stack, 'blob-registry', blobRegistryTableProps)
 
   /**
    * This table takes a stored CAR and makes an entry in the store table
@@ -105,8 +112,14 @@ export function UploadDbStack({ stack, app }) {
    */
   const spaceMetricsTable = new Table(stack, 'space-metrics', spaceMetricsTableProps)
 
+  /**
+   * This table tracks storage providers in the system.
+   */
+  const storageProviderTable = new Table(stack, 'storage-provider', storageProviderTableProps)
+
   return {
     allocationTable,
+    blobRegistryTable,
     storeTable,
     uploadTable,
     pieceTable,
@@ -118,7 +131,8 @@ export function UploadDbStack({ stack, app }) {
     revocationTable,
     adminMetricsTable,
     spaceMetricsTable,
+    storageProviderTable,
     privateKey,
-    contentClaimsPrivateKey
+    indexingServiceProof,
   }
 }

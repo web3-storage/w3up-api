@@ -25,7 +25,7 @@ export function createFilecoinMetricsTable (region, tableName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('../types').FilecoinMetricsStore}
+ * @returns {import('../types.js').FilecoinMetricsStore}
  */
 export function useFilecoinMetricsTable (dynamoDb, tableName) {
   return {

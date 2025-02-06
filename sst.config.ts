@@ -11,7 +11,6 @@ import { CarparkStack } from './stacks/carpark-stack.js'
 import { FilecoinStack } from './stacks/filecoin-stack.js'
 import { ReplicatorStack } from './stacks/replicator-stack.js'
 import { UcanFirehoseStack } from './stacks/firehose-stack.js'
-import { IndexerStack } from './stacks/indexer-stack.js'
 import { RoundaboutStack } from './stacks/roundabout-stack.js'
 import { PSAStack } from './stacks/psa-stack.js'
 import { isPrBuild } from './stacks/config.js'
@@ -44,24 +43,23 @@ export default {
         : 'disabled'
     })
 
-    app.stack(PSAStack)
-    app.stack(BusStack)
+    app.stack(PSAStack) // legacy
+    app.stack(BusStack) // legacy
     app.stack(UploadDbStack)
     app.stack(RoundaboutStack)
     app.stack(BillingDbStack)
-    app.stack(CarparkStack)
+    app.stack(CarparkStack) // legacy
     app.stack(UcanInvocationStack)
     app.stack(BillingStack)
     app.stack(FilecoinStack)
-    app.stack(IndexerStack)
     app.stack(UploadApiStack)
-    app.stack(ReplicatorStack)
+    app.stack(ReplicatorStack) // legacy
     app.stack(UcanFirehoseStack)
 
     // tags let us discover all the aws resource costs incurred by this app
     // see: https://docs.sst.dev/advanced/tagging-resources
     Tags.of(app).add('Project', 'w3infra')
-    Tags.of(app).add('Repository', 'https://github.com/web3-storage/w3infra')
+    Tags.of(app).add('Repository', 'https://github.com/storacha/w3infra')
     Tags.of(app).add('Environment', `${app.stage}`)
     Tags.of(app).add('ManagedBy', 'SST')
   },

@@ -1,15 +1,15 @@
 import { 
   add as storeAdd,
   remove as storeRemove
-} from '@web3-storage/capabilities/store'
+} from '@storacha/capabilities/store'
 import {
   add as uploadAdd,
   remove as uploadRemove
-} from '@web3-storage/capabilities/upload'
+} from '@storacha/capabilities/upload'
 import {
   add as blobAdd,
   remove as blobRemove
-} from '@web3-storage/capabilities/blob'
+} from '@storacha/capabilities/space/blob'
 
 // UCAN protocol
 export const BLOB_ADD = blobAdd.can

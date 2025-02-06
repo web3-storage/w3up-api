@@ -19,11 +19,28 @@ export const storeTableProps = {
 }
 
 /** @type TableProps */
+export const blobRegistryTableProps = {
+  fields: {
+    space: 'string',      // `did:key:space`
+    digest: 'string',     // `zQm...`
+    size: 'number',       // `101`
+    cause: 'string',      // `baf...ucan` (CID of invocation UCAN)
+    insertedAt: 'string', // `2022-12-24T...`
+  },
+  // space + digest must be unique to satisfy index constraint
+  primaryIndex: { partitionKey: 'space', sortKey: 'digest' },
+  globalIndexes: {
+    digest: { partitionKey: 'digest', sortKey: 'space' }
+  }
+}
+
+/** @type TableProps */
 export const uploadTableProps = {
   fields: {
     space: 'string',        // `did:key:space`
     root: 'string',         // `baf...x`
     shard: 'string',        // `bagy...1
+    cause: 'string',        // `baf...ucan` (CID of invocation UCAN)
     insertedAt: 'string',   // `2022-12-24T...`
   },
   // space + root must be unique to satisfy index constraint
@@ -45,7 +62,9 @@ export const allocationTableProps = {
   // space + link must be unique to satisfy index constraint
   primaryIndex: { partitionKey: 'space', sortKey: 'multihash' },
   globalIndexes: {
-    multihash: { partitionKey: 'multihash', sortKey: 'space', projection: ['space', 'insertedAt'] }
+    multihash: { partitionKey: 'multihash', sortKey: 'space', projection: ['space', 'insertedAt'] },
+    // Temporary index to allow migration to blob registry
+    insertedAt: { partitionKey: 'insertedAt', sortKey: 'space', projection: 'all' },
   }
 }
 
@@ -169,4 +188,23 @@ export const blocksCarsPositionTableProps = {
     length: 'number',
   },
   primaryIndex: { partitionKey: 'blockmultihash', sortKey: 'carpath' }
+}
+
+/** @type TableProps */
+export const storageProviderTableProps = {
+  fields: {
+    // DID of the stroage provider.
+    provider: 'string',
+    // Public URL that accepts UCAN invocations.
+    endpoint: 'string',
+    // Proof the upload service can invoke blob/allocate and blob/accept.
+    proof: 'string',
+    // Weight determines chance of selection relative to other providers.
+    weight: 'number',
+    // Date and time the record was created (ISO 8601)
+    insertedAt: 'string',
+    // Date and time the record was last updated (ISO 8601)
+    updatedAt: 'string',
+  },
+  primaryIndex: { partitionKey: 'provider' }
 }

@@ -1,13 +1,16 @@
+import { Config } from 'sst/node/config'
 import { API, error, ok } from '@ucanto/core'
 import * as Delegation from '@ucanto/core/delegation'
-import { base64pad } from 'multiformats/bases/base64'
+import { CAR, Legacy, Codec } from '@ucanto/transport'
+import { DIDResolutionError, Schema } from '@ucanto/validator'
+import * as Link from 'multiformats/link'
+import { base64 } from 'multiformats/bases/base64'
 import * as Sentry from '@sentry/serverless'
 import * as DID from '@ipld/dag-ucan/did'
 import Stripe from 'stripe'
-
+import { Client as IndexingServiceClient } from '@storacha/indexing-service-client'
+import * as UploadAPI from '@storacha/upload-api'
 import { composeCarStoresWithOrderedHas, createCarStore } from '../buckets/car-store.js'
-import { createInvocationStore } from '../buckets/invocation-store.js'
-import { createWorkflowStore } from '../buckets/workflow-store.js'
 import { createStoreTable } from '../tables/store.js'
 import { createUploadTable } from '../tables/upload.js'
 import { createPieceTable } from '../../filecoin/store/piece.js'
@@ -17,12 +20,9 @@ import { createClient as createFilecoinSubmitQueueClient } from '../../filecoin/
 import { createClient as createPieceOfferQueueClient } from '../../filecoin/queue/piece-offer-queue.js'
 import { getServiceSigner, parseServiceDids, getServiceConnection } from '../config.js'
 import { createUcantoServer } from '../service.js'
-import { Config } from 'sst/node/config'
-import { CAR, Legacy, Codec } from '@ucanto/transport'
 import { Email } from '../email.js'
 import * as AgentStore from '../stores/agent.js'
-import { createAllocationsStorage } from '../stores/allocations.js'
-import { createBlobsStorage, composeBlobStoragesWithOrderedHas } from '../stores/blobs.js'
+import { createAllocationTableBlobRegistry, createBlobRegistry } from '../stores/blob-registry.js'
 import { useProvisionStore } from '../stores/provisions.js'
 import { useSubscriptionsStore } from '../stores/subscriptions.js'
 import { createDelegationsTable } from '../tables/delegations.js'
@@ -30,19 +30,21 @@ import { createDelegationsStore } from '../buckets/delegations-store.js'
 import { createSubscriptionTable } from '../tables/subscription.js'
 import { createConsumerTable } from '../tables/consumer.js'
 import { createRateLimitTable } from '../tables/rate-limit.js'
+import { createMetricsTable as createSpaceMetricsStore } from '../stores/space-metrics.js'
+import { createMetricsTable as createAdminMetricsStore } from '../stores/metrics.js'
 import { createSpaceMetricsTable } from '../tables/space-metrics.js'
+import { createStorageProviderTable } from '../tables/storage-provider.js'
 import { createRevocationsTable } from '../stores/revocations.js'
 import { usePlansStore } from '../stores/plans.js'
-import { createCustomerStore } from '@web3-storage/w3infra-billing/tables/customer.js'
-import { createSpaceDiffStore } from '@web3-storage/w3infra-billing/tables/space-diff.js'
-import { createSpaceSnapshotStore } from '@web3-storage/w3infra-billing/tables/space-snapshot.js'
+import { createCustomerStore } from '@storacha/upload-service-infra-billing/tables/customer.js'
+import { createSpaceDiffStore } from '@storacha/upload-service-infra-billing/tables/space-diff.js'
+import { createSpaceSnapshotStore } from '@storacha/upload-service-infra-billing/tables/space-snapshot.js'
 import { useUsageStore } from '../stores/usage.js'
 import { createStripeBillingProvider } from '../billing.js'
-import { createIPNIService } from '../external-services/ipni-service.js'
-import * as UploadAPI from '@web3-storage/upload-api'
 import { mustGetEnv } from '../../lib/env.js'
-import { createEgressTrafficQueue } from '@web3-storage/w3infra-billing/queues/egress-traffic.js'
-import * as UCantoValidator from '@ucanto/validator'
+import { createEgressTrafficQueue } from '@storacha/upload-service-infra-billing/queues/egress-traffic.js'
+import { create as createRoutingService } from '../external-services/router.js'
+import { create as createBlobRetriever } from '../external-services/blob-retriever.js'
 
 Sentry.AWSLambda.init({
   environment: process.env.SST_STAGE,
@@ -53,7 +55,7 @@ Sentry.AWSLambda.init({
 export { API }
 
 /**
- * @typedef {import('../types').Receipt} Receipt
+ * @typedef {import('../types.js').Receipt} Receipt
  * @typedef {import('@ucanto/interface').Block<Receipt>} BlockReceipt
  * @typedef {object} ExecuteCtx
  * @property {import('@ucanto/interface').Signer} signer
@@ -94,11 +96,13 @@ const codec = Codec.inbound({
  */
 export const knownWebDIDs = {
   // Production
-  'did:web:web3.storage': 'did:key:z6MkqdncRZ1wj8zxCTDUQ8CRT8NQWd63T7mZRvZUX8B7XDFi',
+  'did:web:up.storacha.network': 'did:key:z6MkqdncRZ1wj8zxCTDUQ8CRT8NQWd63T7mZRvZUX8B7XDFi',
+  'did:web:web3.storage': 'did:key:z6MkqdncRZ1wj8zxCTDUQ8CRT8NQWd63T7mZRvZUX8B7XDFi', // legacy
   'did:web:w3s.link': 'did:key:z6Mkha3NLZ38QiZXsUHKRHecoumtha3LnbYEL21kXYBFXvo5',
 
   // Staging
-  'did:web:staging.web3.storage': 'did:key:z6MkhcbEpJpEvNVDd3n5RurquVdqs5dPU16JDU5VZTDtFgnn',
+  'did:web:staging.up.storacha.network': 'did:key:z6MkhcbEpJpEvNVDd3n5RurquVdqs5dPU16JDU5VZTDtFgnn',
+  'did:web:staging.web3.storage': 'did:key:z6MkhcbEpJpEvNVDd3n5RurquVdqs5dPU16JDU5VZTDtFgnn', // legacy
   'did:web:staging.w3s.link': 'did:key:z6MkqK1d4thaCEXSGZ6EchJw3tDPhQriwynWDuR55ayATMNf',
 }
 
@@ -116,22 +120,25 @@ export async function ucanInvocationRouter(request) {
     storeBucketName,
     uploadTableName,
     allocationTableName,
+    blobRegistryTableName,
     consumerTableName,
     customerTableName,
     subscriptionTableName,
     delegationTableName,
     revocationTableName,
+    adminMetricsTableName,
     spaceMetricsTableName,
     rateLimitTableName,
     pieceTableName,
     spaceDiffTableName,
     spaceSnapshotTableName,
+    storageProviderTableName,
     r2DelegationBucketEndpoint,
     r2DelegationBucketAccessKeyId,
     r2DelegationBucketSecretAccessKey,
     r2DelegationBucketName,
-    invocationBucketName,
-    workflowBucketName,
+    agentIndexBucketName,
+    agentMessageBucketName,
     streamName,
     postmarkToken,
     providers,
@@ -142,6 +149,7 @@ export async function ucanInvocationRouter(request) {
     filecoinSubmitQueueUrl,
     egressTrafficQueueUrl,
     requirePaymentPlan,
+    principalMapping,
     // set for testing
     dbEndpoint,
     accessServiceURL,
@@ -149,8 +157,6 @@ export async function ucanInvocationRouter(request) {
     carparkBucketEndpoint,
     carparkBucketAccessKeyId,
     carparkBucketSecretAccessKey,
-    blockAdvertisementPublisherQueueConfig,
-    blockIndexWriterQueueConfig,
     sstStage
   } = getLambdaEnv()
 
@@ -160,9 +166,15 @@ export async function ucanInvocationRouter(request) {
     }
   }
 
-  const { UPLOAD_API_DID, CONTENT_CLAIMS_PROOF } = process.env
-  const { PRIVATE_KEY, STRIPE_SECRET_KEY, CONTENT_CLAIMS_PRIVATE_KEY } = Config
+  const { UPLOAD_API_DID } = process.env
+  const { PRIVATE_KEY, STRIPE_SECRET_KEY, INDEXING_SERVICE_PROOF } = Config
   const serviceSigner = getServiceSigner({ did: UPLOAD_API_DID, privateKey: PRIVATE_KEY })
+
+  const options = { endpoint: dbEndpoint }
+  const metrics = {
+    space: createSpaceMetricsStore(AWS_REGION, spaceMetricsTableName, options),
+    admin: createAdminMetricsStore(AWS_REGION, adminMetricsTableName, options)
+  }
 
   const agentStore = AgentStore.open({
     store: {
@@ -173,8 +185,8 @@ export async function ucanInvocationRouter(request) {
       },
       region: AWS_REGION,
       buckets: {
-        message: { name: workflowBucketName },
-        index: { name: invocationBucketName },
+        message: { name: agentMessageBucketName },
+        index: { name: agentIndexBucketName },
       },
     },
     stream: {
@@ -183,32 +195,11 @@ export async function ucanInvocationRouter(request) {
     },
   })
 
-  const allocationsStorage = createAllocationsStorage(AWS_REGION, allocationTableName, {
-    endpoint: dbEndpoint,
-  })
-  const blobsStorage = composeBlobStoragesWithOrderedHas(
-    createBlobsStorage(R2_REGION, carparkBucketName, {
-      endpoint: carparkBucketEndpoint,
-      credentials: {
-        accessKeyId: carparkBucketAccessKeyId,
-        secretAccessKey: carparkBucketSecretAccessKey,
-      }, 
-    }),
-    createBlobsStorage(AWS_REGION, storeBucketName),
-  )
-
-  const invocationBucket = createInvocationStore(
-    AWS_REGION,
-    invocationBucketName
-  )
-  const workflowBucket = createWorkflowStore(AWS_REGION, workflowBucketName)
+  const blobRegistry = createBlobRegistry(AWS_REGION, blobRegistryTableName, metrics, options)
+  const allocationBlobRegistry = createAllocationTableBlobRegistry(blobRegistry, AWS_REGION, allocationTableName, options)
   const delegationBucket = createDelegationsStore(r2DelegationBucketEndpoint, r2DelegationBucketAccessKeyId, r2DelegationBucketSecretAccessKey, r2DelegationBucketName)
-  const subscriptionTable = createSubscriptionTable(AWS_REGION, subscriptionTableName, {
-    endpoint: dbEndpoint
-  });
-  const consumerTable = createConsumerTable(AWS_REGION, consumerTableName, {
-    endpoint: dbEndpoint
-  });
+  const subscriptionTable = createSubscriptionTable(AWS_REGION, subscriptionTableName, options)
+  const consumerTable = createConsumerTable(AWS_REGION, consumerTableName, options)
   const customerStore = createCustomerStore({ region: AWS_REGION }, { tableName: customerTableName })
   if (!STRIPE_SECRET_KEY) throw new Error('missing secret: STRIPE_SECRET_KEY')
   const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' })
@@ -218,7 +209,7 @@ export async function ucanInvocationRouter(request) {
 
   const provisionsStorage = useProvisionStore(subscriptionTable, consumerTable, spaceMetricsTable, parseServiceDids(providers))
   const subscriptionsStorage = useSubscriptionsStore({ consumerTable })
-  const delegationsStorage = createDelegationsTable(AWS_REGION, delegationTableName, { bucket: delegationBucket, invocationBucket, workflowBucket })
+  const delegationsStorage = createDelegationsTable(AWS_REGION, delegationTableName, { bucket: delegationBucket })
   const revocationsStorage = createRevocationsTable(AWS_REGION, revocationTableName)
   const spaceDiffStore = createSpaceDiffStore({ region: AWS_REGION }, { tableName: spaceDiffTableName })
   const spaceSnapshotStore = createSpaceSnapshotStore({ region: AWS_REGION }, { tableName: spaceSnapshotTableName })
@@ -230,51 +221,39 @@ export async function ucanInvocationRouter(request) {
     url: dealTrackerUrl
   })
 
-  const ipniService = createIPNIService(
-    blockAdvertisementPublisherQueueConfig,
-    blockIndexWriterQueueConfig,
-    blobsStorage
-  )
+  const indexingServicePrincipal = DID.parse(mustGetEnv('INDEXING_SERVICE_DID'))
+  const indexingServiceURL = new URL(mustGetEnv('INDEXING_SERVICE_URL'))
 
-  const claimsServicePrincipal = DID.parse(mustGetEnv('CONTENT_CLAIMS_DID'))
-  const claimsServiceURL = new URL(mustGetEnv('CONTENT_CLAIMS_URL'))
-  let claimsIssuer = getServiceSigner({ privateKey: CONTENT_CLAIMS_PRIVATE_KEY })
-  const claimsProofs = []
-  if (CONTENT_CLAIMS_PROOF) {
-    const proof = await Delegation.extract(base64pad.decode(CONTENT_CLAIMS_PROOF))
-    if (!proof.ok) throw new Error('failed to extract proof', { cause: proof.error })
-    claimsProofs.push(proof.ok)
-  } else {
-    // if no proofs, we must be using the service private key to sign
-    claimsIssuer = claimsIssuer.withDID(claimsServicePrincipal.did())
-  }
-  const claimsService = {
+  const cid = Link.parse(INDEXING_SERVICE_PROOF, base64)
+  const proof = await Delegation.extract(cid.multihash.digest)
+  if (!proof.ok) throw new Error('failed to extract proof', { cause: proof.error })
+
+  const indexingServiceConfig = {
     invocationConfig: {
-      issuer: claimsIssuer,
-      audience: claimsServicePrincipal,
-      with: claimsIssuer.did(),
-      proofs: claimsProofs
+      issuer: serviceSigner,
+      audience: indexingServicePrincipal,
+      with: indexingServicePrincipal.did(),
+      proofs: [proof.ok]
     },
     connection: getServiceConnection({
-      did: claimsServicePrincipal.did(),
-      url: claimsServiceURL.toString()
+      did: indexingServicePrincipal.did(),
+      url: new URL('/claims', indexingServiceURL).toString()
     })
   }
+  const indexingServiceClient = new IndexingServiceClient({ serviceURL: indexingServiceURL })
+  const blobRetriever = createBlobRetriever(indexingServiceClient)
+  const storageProviderTable = createStorageProviderTable(AWS_REGION, storageProviderTableName, options)
+  const routingService = createRoutingService(storageProviderTable, serviceSigner)
 
   const server = createUcantoServer(serviceSigner, {
     codec,
-    allocationsStorage,
-    blobsStorage,
-    blobRetriever: blobsStorage,
-    // @ts-expect-error - TODO: it supports the resolveDIDKey method, but it is not typed, see https://github.com/storacha/ucanto/issues/359 for more details.
-    resolveDIDKey: (did) => {
-      const didKey = knownWebDIDs[did]
-      if (didKey) {
-        return ok(didKey)
-      }
-      return error(new UCantoValidator.DIDResolutionError(did))
-    },
-    getServiceConnection: () => connection,
+    router: routingService,
+    registry: allocationBlobRegistry,
+    blobRetriever,
+    resolveDIDKey: (did) =>
+      Schema.did({ method: 'web' }).is(did) && principalMapping[did]
+        ? ok(principalMapping[did])
+        : error(new DIDResolutionError(did)),
     // TODO: to be deprecated with `store/*` protocol
     storeTable: createStoreTable(AWS_REGION, storeTableName, {
       endpoint: dbEndpoint,
@@ -290,9 +269,7 @@ export async function ucanInvocationRouter(request) {
         },
       }),
     ),
-    uploadTable: createUploadTable(AWS_REGION, uploadTableName, {
-      endpoint: dbEndpoint,
-    }),
+    uploadTable: createUploadTable(AWS_REGION, uploadTableName, metrics, options),
     signer: serviceSigner,
     // TODO: we should set URL from a different env var, doing this for now to avoid that refactor - tracking in https://github.com/web3-storage/w3infra/issues/209
     url: new URL(accessServiceURL),
@@ -305,8 +282,8 @@ export async function ucanInvocationRouter(request) {
     rateLimitsStorage,
     aggregatorId: DID.parse(aggregatorDid),
     pieceStore: createPieceTable(AWS_REGION, pieceTableName),
-    taskStore: createFilecoinTaskStore(AWS_REGION, invocationBucketName, workflowBucketName),
-    receiptStore: createFilecoinReceiptStore(AWS_REGION, invocationBucketName, workflowBucketName),
+    taskStore: createFilecoinTaskStore(AWS_REGION, agentIndexBucketName, agentMessageBucketName),
+    receiptStore: createFilecoinReceiptStore(AWS_REGION, agentIndexBucketName, agentMessageBucketName),
     pieceOfferQueue: createPieceOfferQueueClient({ region: AWS_REGION }, { queueUrl: pieceOfferQueueUrl }),
     filecoinSubmitQueue: createFilecoinSubmitQueueClient({ region: AWS_REGION }, { queueUrl: filecoinSubmitQueueUrl }),
     dealTrackerService: {
@@ -320,17 +297,10 @@ export async function ucanInvocationRouter(request) {
     plansStorage,
     requirePaymentPlan,
     usageStorage,
-    ipniService,
-    claimsService
-  })
-
-  const connection = UploadAPI.connect({
-    id: serviceSigner,
-    channel: server,
+    claimsService: indexingServiceConfig
   })
 
   const payload = fromLambdaRequest(request)
-
   const response = await UploadAPI.handle(server, payload)
 
   return toLambdaResponse(response)
@@ -364,16 +334,19 @@ function getLambdaEnv () {
     storeBucketName: mustGetEnv('STORE_BUCKET_NAME'),
     uploadTableName: mustGetEnv('UPLOAD_TABLE_NAME'),
     allocationTableName: mustGetEnv('ALLOCATION_TABLE_NAME'),
+    blobRegistryTableName: mustGetEnv('BLOB_REGISTRY_TABLE_NAME'),
     consumerTableName: mustGetEnv('CONSUMER_TABLE_NAME'),
     customerTableName: mustGetEnv('CUSTOMER_TABLE_NAME'),
     subscriptionTableName: mustGetEnv('SUBSCRIPTION_TABLE_NAME'),
     delegationTableName: mustGetEnv('DELEGATION_TABLE_NAME'),
     revocationTableName: mustGetEnv('REVOCATION_TABLE_NAME'),
     spaceMetricsTableName: mustGetEnv('SPACE_METRICS_TABLE_NAME'),
+    adminMetricsTableName: mustGetEnv('ADMIN_METRICS_TABLE_NAME'),
     rateLimitTableName: mustGetEnv('RATE_LIMIT_TABLE_NAME'),
     pieceTableName: mustGetEnv('PIECE_TABLE_NAME'),
     spaceDiffTableName: mustGetEnv('SPACE_DIFF_TABLE_NAME'),
     spaceSnapshotTableName: mustGetEnv('SPACE_SNAPSHOT_TABLE_NAME'),
+    storageProviderTableName: mustGetEnv('STORAGE_PROVIDER_TABLE_NAME'),
     pieceOfferQueueUrl: mustGetEnv('PIECE_OFFER_QUEUE_URL'),
     filecoinSubmitQueueUrl: mustGetEnv('FILECOIN_SUBMIT_QUEUE_URL'),
     egressTrafficQueueUrl: mustGetEnv('EGRESS_TRAFFIC_QUEUE_URL'),
@@ -381,9 +354,8 @@ function getLambdaEnv () {
     r2DelegationBucketAccessKeyId: mustGetEnv('R2_ACCESS_KEY_ID'),
     r2DelegationBucketSecretAccessKey: mustGetEnv('R2_SECRET_ACCESS_KEY'),
     r2DelegationBucketName: mustGetEnv('R2_DELEGATION_BUCKET_NAME'),
-    invocationBucketName: mustGetEnv('INVOCATION_BUCKET_NAME'),
-    taskBucketName: mustGetEnv('TASK_BUCKET_NAME'),
-    workflowBucketName: mustGetEnv('WORKFLOW_BUCKET_NAME'),
+    agentIndexBucketName: mustGetEnv('AGENT_INDEX_BUCKET_NAME'),
+    agentMessageBucketName: mustGetEnv('AGENT_MESSAGE_BUCKET_NAME'),
     streamName: mustGetEnv('UCAN_LOG_STREAM_NAME'),
     postmarkToken: mustGetEnv('POSTMARK_TOKEN'),
     providers: mustGetEnv('PROVIDERS'),
@@ -398,16 +370,10 @@ function getLambdaEnv () {
     carparkBucketEndpoint: mustGetEnv('R2_ENDPOINT'),
     carparkBucketAccessKeyId: mustGetEnv('R2_ACCESS_KEY_ID'),
     carparkBucketSecretAccessKey: mustGetEnv('R2_SECRET_ACCESS_KEY'),
-    // IPNI service
-    blockAdvertisementPublisherQueueConfig: {
-      url: new URL(mustGetEnv('BLOCK_ADVERT_PUBLISHER_QUEUE_URL')),
-      region: AWS_REGION
-    },
-    blockIndexWriterQueueConfig: {
-      url: new URL(mustGetEnv('BLOCK_INDEX_WRITER_QUEUE_URL')),
-      region: AWS_REGION
-    },
     sstStage: mustGetEnv('SST_STAGE'),
+    principalMapping:
+      /** @type {Record<`did:web:${string}`, `did:key:${string}`>} */
+      ({ ...knownWebDIDs, ...JSON.parse(process.env.PRINCIPAL_MAPPING || '{}') }),
     // set for testing
     dbEndpoint: process.env.DYNAMO_DB_ENDPOINT,
   }

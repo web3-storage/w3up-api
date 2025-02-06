@@ -36,7 +36,7 @@ async function getServicePublicKey(apiEndpoint) {
 
 /**
  * 
- * @param {import('@web3-storage/w3up-client').Client} client 
+ * @param {import('@storacha/client').Client} client 
  * @param {[import('@ucanto/interface').Capability, ...import('@ucanto/interface').Capability[]]} capabilities 
  * @param {number} expiration 
  * @param {string | undefined} password 
@@ -63,7 +63,7 @@ async function generateAuthHeaders(client, capabilities, expiration, password = 
 /**
  * 
  * @param {import('./helpers/context.js').Context} context 
- * @param {import('@web3-storage/w3up-client').Client} client 
+ * @param {import('@storacha/client').Client} client 
  * @param {[import('@ucanto/interface').Capability, ...import('@ucanto/interface').Capability[]]} capabilities 
  * @param {number} expiration 
  * @param {any} requestBody 

@@ -1,5 +1,5 @@
 import { DID, Link, URI, LinkJSON, Result, Capabilities, Unit, Failure, UnknownLink } from '@ucanto/interface'
-import { StoreRecord } from '../types'
+import { StoreRecord } from '../types.js'
 
 // Billing stores /////////////////////////////////////////////////////////////
 

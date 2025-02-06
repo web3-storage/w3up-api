@@ -2,7 +2,7 @@ import * as dagJSON from '@ipld/dag-json'
 import { EncodeFailure, DecodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').CustomerBillingInstruction} CustomerBillingInstruction
+ * @typedef {import('../lib/api.js').CustomerBillingInstruction} CustomerBillingInstruction
  */
 
 export const schema = Schema.struct({
@@ -13,10 +13,10 @@ export const schema = Schema.struct({
   to: Schema.date()
 })
 
-/** @type {import('../lib/api').Validator<CustomerBillingInstruction>} */
+/** @type {import('../lib/api.js').Validator<CustomerBillingInstruction>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<CustomerBillingInstruction, string>} */
+/** @type {import('../lib/api.js').Encoder<CustomerBillingInstruction, string>} */
 export const encode = message => {
   try {
     const data = {
@@ -32,7 +32,7 @@ export const encode = message => {
   }
 }
 
-/** @type {import('../lib/api').Decoder<string, CustomerBillingInstruction>} */
+/** @type {import('../lib/api.js').Decoder<string, CustomerBillingInstruction>} */
 export const decode = str => {
   try {
     const data = dagJSON.parse(str)

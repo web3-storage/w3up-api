@@ -1,6 +1,6 @@
 import { SQSClient, SendMessageBatchCommand } from '@aws-sdk/client-sqs'
 import retry from 'p-retry'
-import { webcrypto } from 'one-webcrypto'
+import { webcrypto } from '@storacha/one-webcrypto'
 import { QueueOperationFailure } from './lib.js'
 import { getSQSClient } from '../../lib/aws/sqs.js'
 

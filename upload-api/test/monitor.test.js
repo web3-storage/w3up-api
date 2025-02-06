@@ -1,20 +1,28 @@
 import anyTest from 'ava'
-import { uploadTableProps } from '../tables/index.js'
+import { uploadTableProps, spaceMetricsTableProps, adminMetricsTableProps } from '../tables/index.js'
 import { createDynamodDb, createTable } from './helpers/resources.js'
 import { useUploadTable } from '../tables/upload.js'
+import { useMetricsTable as useAdminMetricsStore } from '../stores/metrics.js'
+import { useMetricsTable as useSpaceMetricsStore } from '../stores/space-metrics.js'
 import { randomCID, randomDID } from './helpers/random.js'
 import * as Monitor from '../monitor.js'
 
 /**
- * @typedef {{ tableName: string, uploadTable: import('@web3-storage/upload-api').UploadTable }} Context
+ * @typedef {{ tableName: string, uploadTable: import('@storacha/upload-api').UploadTable }} Context
  * @typedef {import('ava').TestFn<import('./helpers/context.js').DynamoContext & Context>} TestFn
  */
 const test = /** @type {TestFn} */ (anyTest)
 
 test.before(async t => {
   const dynamo = await createDynamodDb()
+  const spaceMetricsTableName = await createTable(dynamo, spaceMetricsTableProps)
+  const adminMetricsTableName = await createTable(dynamo, adminMetricsTableProps)
+  const metrics = {
+    space: useSpaceMetricsStore(dynamo, spaceMetricsTableName),
+    admin: useAdminMetricsStore(dynamo, adminMetricsTableName)
+  }
   const tableName = await createTable(dynamo, uploadTableProps)
-  const uploadTable = useUploadTable(dynamo, tableName)
+  const uploadTable = useUploadTable(dynamo, tableName, metrics)
   Object.assign(t.context, { dynamo, uploadTable, tableName })
 })
 
@@ -23,9 +31,9 @@ test('should retrieve a random sample of upload root CIDs', async t => {
 
   const uploads = []
   for (let i = 0; i < 10; i++) {
-    const [space, root, issuer, invocation] =
+    const [space, root, issuer, cause] =
       await Promise.all([randomDID(), randomCID(), randomDID(), randomCID()])
-    const upload = { space, root, issuer, invocation }
+    const upload = { space, root, issuer, cause }
     const res = await uploadTable.upsert(upload)
     t.truthy(res.ok)
     uploads.push(upload)

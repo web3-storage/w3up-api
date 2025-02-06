@@ -1,8 +1,7 @@
 /**
- * 
- * @param {import("@web3-storage/w3infra-billing/lib/api").CustomerStore} customerStore
+ * @param {import("../../billing/lib/api.js").CustomerStore} customerStore
  * @param {import('../types.js').BillingProvider} billingProvider
- * @returns {import("@web3-storage/upload-api").PlansStorage}
+ * @returns {import("@storacha/upload-api").PlansStorage}
  */
 export function usePlansStore(customerStore, billingProvider) {
   return {

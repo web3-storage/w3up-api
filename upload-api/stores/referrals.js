@@ -3,7 +3,7 @@
  *
  * @param {object} [options]
  * @param {string} [options.endpoint]
- * @returns {import("../types").ReferralsStore}
+ * @returns {import('../types.js').ReferralsStore}
  */
 export function createReferralStore(options = {}) {
   return {

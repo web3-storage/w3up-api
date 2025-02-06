@@ -22,7 +22,7 @@ export function createMetricsTable (region, tableName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('../types').MetricsStore}
+ * @returns {import('../types.js').MetricsStore}
  */
 export function useMetricsTable (dynamoDb, tableName) {
   return {

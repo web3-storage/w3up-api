@@ -1,4 +1,4 @@
-import * as DidMailto from '@web3-storage/did-mailto'
+import * as DidMailto from '@storacha/did-mailto'
 
 /**
  * @typedef {import('../lib/api.js').AccountID} AccountID

@@ -4,8 +4,8 @@ import pWaitFor from 'p-wait-for'
 import { HeadObjectCommand } from '@aws-sdk/client-s3'
 import { PutItemCommand } from '@aws-sdk/client-dynamodb'
 import { marshall } from '@aws-sdk/util-dynamodb'
-import * as StoreCapabilities from '@web3-storage/capabilities/store'
-import { ShardingStream, UnixFS, Store, Upload } from '@web3-storage/upload-client'
+import * as StoreCapabilities from '@storacha/capabilities/store'
+import { ShardingStream, UnixFS, Store, Upload } from '@storacha/upload-client'
 
 import { METRICS_NAMES, SPACE_METRICS_NAMES } from '../upload-api/constants.js'
 
@@ -77,9 +77,9 @@ test('store protocol integration flow', async t => {
 
   // Encode file as Unixfs and perform store/add
   const blocksReadableStream = UnixFS.createFileEncoderStream(file)
-  /** @type {import('@web3-storage/upload-client/types').CARLink[]} */
+  /** @type {import('@storacha/upload-client/types').CARLink[]} */
   const shards = []
-  /** @type {import('@web3-storage/upload-client/types').AnyLink | undefined} */
+  /** @type {import('@storacha/upload-client/types').AnyLink | undefined} */
   let root
 
   await blocksReadableStream

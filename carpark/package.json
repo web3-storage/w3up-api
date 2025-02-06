@@ -1,5 +1,5 @@
 {
-  "name": "@web3-storage/w3infra-carpark",
+  "name": "@storacha/upload-service-infra-carpark",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

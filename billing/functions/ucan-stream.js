@@ -51,7 +51,7 @@ export const handler = Sentry.AWSLambda.wrapHandler(
 
 /**
  * @param {import('aws-lambda').KinesisStreamEvent} event
- * @returns {import('../lib/api').UcanStreamMessage[]}
+ * @returns {import('../lib/api.js').UcanStreamMessage[]}
  */
 const parseUcanStreamEvent = event => {
   const batch = event.Records.map(r => fromString(r.kinesis.data, 'base64'))
@@ -91,11 +91,11 @@ const CONSUMER_LIST_CACHE_TTL = 1000 * 60 * 5
 const CONSUMER_LIST_CACHE_MAX = 10_000
 
 /**
- * @param {import('../lib/api').ConsumerStore} consumerStore
- * @returns {import('../lib/api').ConsumerStore}
+ * @param {import('../lib/api.js').ConsumerStore} consumerStore
+ * @returns {import('../lib/api.js').ConsumerStore}
  */
 const withConsumerListCache = (consumerStore) => {
-  /** @type {LRUCache<string, Awaited<ReturnType<import('../lib/api').ConsumerStore['list']>>>} */
+  /** @type {LRUCache<string, Awaited<ReturnType<import('../lib/api.js').ConsumerStore['list']>>>} */
   const cache = new LRUCache({
     max: CONSUMER_LIST_CACHE_MAX,
     ttl: CONSUMER_LIST_CACHE_TTL

@@ -4,8 +4,8 @@ import { randomDIDMailto } from './did.js'
 import { randomInteger } from './math.js'
 
 /**
- * @param {Partial<import('../../lib/api').Customer>} [base]
- * @returns {import('../../lib/api').Customer}
+ * @param {Partial<import('../../lib/api.js').Customer>} [base]
+ * @returns {import('../../lib/api.js').Customer}
  */
 export const randomCustomer = (base = {}) => ({
   customer: randomDIDMailto(),

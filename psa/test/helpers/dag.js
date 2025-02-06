@@ -18,18 +18,14 @@ export const randomBlock = () => {
  */
 export const encodeCAR = (root, blocks) => {
   const roots = [root]
-  // @ts-expect-error
   const headerSize = CarBufferWriter.headerLength({ roots })
   let blocksSize = 0
   for (const b of blocks) {
-    // @ts-expect-error
     blocksSize += CarBufferWriter.blockLength(b)
   }
-  // @ts-expect-error
   const writer = CarBufferWriter.createWriter(new Uint8Array(headerSize + blocksSize), { roots })
 
   for (const b of blocks) {
-    // @ts-expect-error
     writer.write(b)
   }
   const bytes = writer.close()

@@ -38,7 +38,7 @@ export const getApiEndpoint = () => {
   // CI/CD deployment
   if (process.env.SEED_APP_NAME) {
     const stage = getStage()
-    return `https://${stage}.up.web3.storage`
+    return `https://${stage}.up.storacha.network`
   }
 
   const require = createRequire(import.meta.url)

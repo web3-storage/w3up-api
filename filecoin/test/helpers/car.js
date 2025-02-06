@@ -6,6 +6,15 @@ import { CarBufferWriter } from '@ipld/car'
 import { toString } from 'uint8arrays'
 import { Piece } from '@web3-storage/data-segment'
 
+/**
+ * @returns {Promise<{
+ *   body: Uint8Array
+ *   checksum: string
+ *   key: string
+ *   link: import('multiformats').UnknownLink
+ *   piece: import('@web3-storage/data-segment').PieceLink
+ * }>}
+ */
 export async function createCar () {
   const id = await encode({
     value: pb.prepare({ Data: 'a red car on the street!' }),

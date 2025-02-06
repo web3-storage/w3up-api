@@ -3,7 +3,7 @@ import {
   ListObjectsV2Command
 } from '@aws-sdk/client-s3'
 import * as CAR from '@ucanto/transport/car'
-import { RecordNotFound, StorageOperationFailed } from '@web3-storage/upload-api/errors'
+import { RecordNotFound, StorageOperationFailed } from '@storacha/upload-api/errors'
 
 /**
  * @param {string} messageCid 

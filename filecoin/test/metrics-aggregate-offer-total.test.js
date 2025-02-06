@@ -5,16 +5,16 @@ import * as DAGJson from '@ipld/dag-json'
 
 import { CBOR, CAR } from '@ucanto/core'
 import * as Signer from '@ucanto/principal/ed25519'
-import * as DealerCapabilities from '@web3-storage/capabilities/filecoin/dealer'
-import * as StoreCapabilities from '@web3-storage/capabilities/store'
-import { randomAggregate } from '@web3-storage/filecoin-api/test'
+import * as DealerCapabilities from '@storacha/capabilities/filecoin/dealer'
+import * as StoreCapabilities from '@storacha/capabilities/store'
+import { randomAggregate } from '@storacha/filecoin-api/test'
 import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { Piece } from '@web3-storage/data-segment'
 
 import { updateAggregateOfferTotal } from '../metrics.js'
 import { METRICS_NAMES, STREAM_TYPE } from '../constants.js'
 
-import { adminMetricsTableProps } from '@web3-storage/w3infra-upload-api/tables/index.js'
+import { adminMetricsTableProps } from '@storacha/upload-service-infra-upload-api/tables/index.js'
 import { createFilecoinMetricsTable } from '../store/metrics.js'
 import { createWorkflowStore } from '../store/workflow.js'
 import { createInvocationStore } from '../store/invocation.js'
@@ -340,7 +340,7 @@ test('skips invocation with aggregate/offer if before start epoch ms', async t =
  * @param {{ workflowBucketName: string, invocationBucketName: string, s3: import('@aws-sdk/client-s3').S3Client }} ctx
  */
 async function prepareUcanStream (workflows, ctx) {
-  const w3sService = await Signer.generate()
+  const storageService = await Signer.generate()
 
   return Promise.all(workflows.map(async aggregateOffers => {
     const invocationsToExecute = await Promise.all(aggregateOffers.map(async agg => {
@@ -353,9 +353,9 @@ async function prepareUcanStream (workflows, ctx) {
         pieces: piecesBlock.cid,
       }
       const invocation = await DealerCapabilities.aggregateOffer.delegate({
-        issuer: w3sService,
-        audience: w3sService,
-        with: w3sService.did(),
+        issuer: storageService,
+        audience: storageService,
+        with: storageService.did(),
         nb: invocationParameters
       })
       invocation.attach(piecesBlock)
@@ -395,11 +395,11 @@ async function prepareUcanStream (workflows, ctx) {
       carCid: agentMessageCarCid,
       value: {
           att: invocationsToExecute.map(ie => DealerCapabilities.aggregateOffer.create({
-            with: w3sService.did(),
+            with: storageService.did(),
             nb: ie.params
           })),
-          aud: w3sService.did(),
-          iss: w3sService.did()
+          aud: storageService.did(),
+          iss: storageService.did()
       },
       invocationCid: invocationsToExecute[0].invocation.cid.toString(),
       type: STREAM_TYPE.RECEIPT,

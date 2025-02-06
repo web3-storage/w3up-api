@@ -13,7 +13,7 @@ Sentry.AWSLambda.init({
 })
 
 /**
- * @param {import('./source').EventBridgeEvent} event 
+ * @param {import('./source.js').EventBridgeEvent} event 
  * @param {import('@aws-sdk/client-sqs').SQSClient} client
  * @param {string} queueUrl
  */
@@ -31,7 +31,7 @@ export async function eipfsHandler(event, client, queueUrl) {
 }
 
 /**
- * @param {import('./source').EventBridgeEvent} event 
+ * @param {import('./source.js').EventBridgeEvent} event 
  */
 async function messageHandler (event) {
   const sqsClient = getSQSClient({

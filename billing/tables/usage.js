@@ -39,7 +39,7 @@ export const usageTableProps = {
 /**
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {{ tableName: string }} context
- * @returns {import('../lib/api').UsageStore}
+ * @returns {import('../lib/api.js').UsageStore}
  */
 export const createUsageStore = (conf, { tableName }) =>
   createStorePutterClient(conf, { tableName, validate, encode })

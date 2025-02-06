@@ -58,7 +58,7 @@ export function getQueues (ctx) {
  * @param {import('@aws-sdk/client-s3').S3Client} s3client
  * @param {string} invocationBucketName
  * @param {string} workflowBucketName
- * @returns {import('@web3-storage/filecoin-api/storefront/api').TaskStore}
+ * @returns {import('@storacha/filecoin-api/storefront/api').TaskStore}
  */
 function getTaskStoreClient (s3client, invocationBucketName, workflowBucketName) {
   const taskStore = createTaskStoreClient(s3client, invocationBucketName, workflowBucketName)
@@ -99,7 +99,7 @@ function getTaskStoreClient (s3client, invocationBucketName, workflowBucketName)
  * @param {import('@aws-sdk/client-s3').S3Client} s3client
  * @param {string} invocationBucketName
  * @param {string} workflowBucketName
- * @returns {import('@web3-storage/filecoin-api/storefront/api').ReceiptStore}
+ * @returns {import('@storacha/filecoin-api/storefront/api').ReceiptStore}
  */
 function getReceiptStoreClient (s3client, invocationBucketName, workflowBucketName) {
   const receiptStore = createReceiptStoreClient(s3client, invocationBucketName, workflowBucketName)

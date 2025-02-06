@@ -20,7 +20,7 @@ export function createWorkflowStore(region, bucketName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-s3').S3Client} s3client
  * @param {string} bucketName
- * @returns {import('../types').WorkflowBucket}
+ * @returns {import('../types.js').WorkflowBucket}
  */
 export const useWorkflowStore = (s3client, bucketName) => {
   return {

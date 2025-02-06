@@ -3,7 +3,7 @@ import * as dagJSON from '@ipld/dag-json'
 import { createQueueClient } from './client.js'
 
 /**
- * @typedef {import('@web3-storage/filecoin-api/storefront/api').FilecoinSubmitMessage} FilecoinSubmitMessage
+ * @typedef {import('@storacha/filecoin-api/storefront/api').FilecoinSubmitMessage} FilecoinSubmitMessage
  * @typedef {import('./client.js').ClientEncodedMessage} ClientEncodedMessage
  */
 
@@ -30,7 +30,7 @@ export const decodeMessage = (message) => {
  * @param {import('./types.js').QueueConnect | import('@aws-sdk/client-sqs').SQSClient} conf
  * @param {object} context
  * @param {string} context.queueUrl
- * @returns {import('@web3-storage/filecoin-api/storefront/api').FilecoinSubmitQueue}
+ * @returns {import('@storacha/filecoin-api/storefront/api').FilecoinSubmitQueue}
  */
 export function createClient (conf, context) {
   return createQueueClient(conf,

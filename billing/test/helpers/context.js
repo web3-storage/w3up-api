@@ -28,8 +28,8 @@ dotenv.config({ path: path.resolve('../.env.local'), override: true, debug: true
 
 /**
  * @typedef {{
- *  dynamo: import('./aws').AWSService<import('@aws-sdk/client-dynamodb').DynamoDBClient>
- *  sqs: import('./aws').AWSService<import('@aws-sdk/client-sqs').SQSClient>
+ *  dynamo: import('./aws.js').AWSService<import('@aws-sdk/client-dynamodb').DynamoDBClient>
+ *  sqs: import('./aws.js').AWSService<import('@aws-sdk/client-sqs').SQSClient>
  * }} AWSServices
  */
 
@@ -167,7 +167,7 @@ export const createUCANStreamTestContext = async () => {
 }
 
 /**
- * @returns {Promise<import('../lib/api').EgressTrafficTestContext>}
+ * @returns {Promise<import('../lib/api.js').EgressTrafficTestContext>}
  */
 export const createEgressTrafficTestContext = async () => {
   await createAWSServices()
@@ -223,11 +223,11 @@ export const createEgressTrafficTestContext = async () => {
 
 /**
  * @template C
- * @param {import('../lib/api').TestSuite<C>} suite
+ * @param {import('../lib/api.js').TestSuite<C>} suite
  * @param {() => Promise<C>} createContext
  */
 export const bindTestContext = (suite, createContext) => {
-  /** @type {import('../lib/api').TestSuite<C>} */
+  /** @type {import('../lib/api.js').TestSuite<C>} */
   const test = {}
   for (const [name, impl] of Object.entries(suite)) {
     test[name] = async (assert) => impl(assert, await createContext())

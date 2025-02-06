@@ -15,9 +15,9 @@ export const connectTable = target =>
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {object} context
  * @param {string} context.tableName
- * @param {import('../lib/api').Validator<T>} context.validate
- * @param {import('../lib/api').Encoder<T, import('../types').StoreRecord>} context.encode
- * @returns {import('../lib/api').StorePutter<T>}
+ * @param {import('../lib/api.js').Validator<T>} context.validate
+ * @param {import('../lib/api.js').Encoder<T, import('../types.js').StoreRecord>} context.encode
+ * @returns {import('../lib/api.js').StorePutter<T>}
  */
 export const createStorePutterClient = (conf, context) => {
   const client = connectTable(conf)
@@ -59,9 +59,9 @@ export const createStorePutterClient = (conf, context) => {
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {object} context
  * @param {string} context.tableName
- * @param {import('../lib/api').Validator<T>} context.validate
- * @param {import('../lib/api').Encoder<T, import('../types').StoreRecord>} context.encode
- * @returns {import('../lib/api').StoreBatchPutter<T>}
+ * @param {import('../lib/api.js').Validator<T>} context.validate
+ * @param {import('../lib/api.js').Encoder<T, import('../types.js').StoreRecord>} context.encode
+ * @returns {import('../lib/api.js').StoreBatchPutter<T>}
  */
 export const createStoreBatchPutterClient = (conf, context) => {
   const client = connectTable(conf)
@@ -107,9 +107,9 @@ export const createStoreBatchPutterClient = (conf, context) => {
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {object} context
  * @param {string} context.tableName
- * @param {import('../lib/api').Encoder<K, import('../types').StoreRecord>} context.encodeKey
- * @param {import('../lib/api').Decoder<import('../types').StoreRecord, V>} context.decode
- * @returns {import('../lib/api').StoreGetter<K, V>}
+ * @param {import('../lib/api.js').Encoder<K, import('../types.js').StoreRecord>} context.encodeKey
+ * @param {import('../lib/api.js').Decoder<import('../types.js').StoreRecord, V>} context.decode
+ * @returns {import('../lib/api.js').StoreGetter<K, V>}
  */
 export const createStoreGetterClient = (conf, context) => {
   const client = connectTable(conf)
@@ -154,8 +154,8 @@ export const createStoreGetterClient = (conf, context) => {
  * @template {object} K
  * @template V
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
- * @param {import('../lib/api').CreateStoreListerContext<K,V>} context
- * @returns {import('../lib/api').StoreLister<K, V>}
+ * @param {import('../lib/api.js').CreateStoreListerContext<K,V>} context
+ * @returns {import('../lib/api.js').StoreLister<K, V>}
  */
 export const createStoreListerClient = (conf, context) => {
   const client = connectTable(conf)

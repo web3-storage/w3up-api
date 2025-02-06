@@ -10,8 +10,8 @@ import { connectTable } from '../../tables/client.js'
  * @param {object} context
  * @param {string} context.tableName
  * @param {import('../../lib/api.js').Encoder<K, import('../../types.js').StoreRecord>} context.encodeKey
- * @param {import('../lib/api').Decoder<import('../../types.js').StoreRecord, V>} context.decode
- * @returns {import('../lib/api').StoreLister<K, V>}
+ * @param {import('../lib/api.js').Decoder<import('../../types.js').StoreRecord, V>} context.decode
+ * @returns {import('../lib/api.js').StoreLister<K, V>}
  */
 export const createStoreListerClient = (conf, context) => {
   const client = connectTable(conf)

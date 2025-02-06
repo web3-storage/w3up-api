@@ -1,6 +1,3 @@
-import { GetItemCommand } from '@aws-sdk/client-dynamodb'
-import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
-import { METRICS_NAMES } from '../constants.js'
 import { getDynamoClient } from '../../lib/aws/dynamo.js'
 
 
@@ -24,7 +21,7 @@ export function createSpaceMetricsTable(region, tableName, options = {}) {
 /**
  * @param {import('@aws-sdk/client-dynamodb').DynamoDBClient} dynamoDb
  * @param {string} tableName
- * @returns {import('../types').SpaceMetricsTable}
+ * @returns {import('../types.js').SpaceMetricsTable}
  */
 export function useSpaceMetricsTable(dynamoDb, tableName) {
   return {
@@ -34,14 +31,21 @@ export function useSpaceMetricsTable(dynamoDb, tableName) {
      * @param {import('@ucanto/interface').DIDKey} consumer the space whose current allocation we should return
      */
     getAllocated: async (consumer) => {
-      const response = await dynamoDb.send(new GetItemCommand({
-        TableName: tableName,
-        Key: marshall({
-          space: consumer,
-          name:  METRICS_NAMES.STORE_ADD_SIZE_TOTAL
-        })
-      }))
-      return response.Item ? unmarshall(response.Item).value : 0
+      // FIXME: this broke when we transitioned to the blob protocol. Arguably
+      // it was broken before since it does not take into account removals.
+      //
+      // AFAIK the value is unused - we use `usage/report` capability for this
+      // information instead.
+      //
+      // const response = await dynamoDb.send(new GetItemCommand({
+      //   TableName: tableName,
+      //   Key: marshall({
+      //     space: consumer,
+      //     name:  METRICS_NAMES.STORE_ADD_SIZE_TOTAL
+      //   })
+      // }))
+      // return response.Item ? unmarshall(response.Item).value : 0
+      return 0
     }
   }
 }

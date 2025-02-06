@@ -4,7 +4,7 @@ import { randomConsumer } from '../helpers/consumer.js'
 import { randomCustomer } from '../helpers/customer.js'
 import { randomLink } from '../helpers/dag.js'
 
-/** @type {import('./api').TestSuite<import('./api').SpaceBillingQueueTestContext>} */
+/** @type {import('./api.js').TestSuite<import('./api.js').SpaceBillingQueueTestContext>} */
 export const test = {
   'should do basic usage calculation for new space with single item added at snapshot time': async (/** @type {import('entail').assert} */ assert, ctx) => {
     const customer = randomCustomer()

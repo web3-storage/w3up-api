@@ -2,7 +2,7 @@ import { testFilecoin as test } from './helpers/context.js'
 import { fetch } from '@web-std/fetch'
 import pWaitFor from 'p-wait-for'
 import * as CAR from '@ucanto/transport/car'
-import { Storefront } from '@web3-storage/filecoin-client'
+import { Storefront } from '@storacha/filecoin-client'
 import * as Link from 'multiformats/link'
 import * as raw from 'multiformats/codecs/raw'
 import { base58btc } from 'multiformats/bases/base58'
@@ -25,7 +25,7 @@ import { pollQueryTable } from './helpers/table.js'
 import { waitForStoreOperationOkResult } from './helpers/store.js'
 
 /**
- * @typedef {import('@web3-storage/w3up-client/src/types.js').CARLink} CARLink
+ * @typedef {import('@storacha/client/src/types.js').CARLink} CARLink
  * @typedef {import('@web3-storage/data-segment').PieceLink} PieceLink
  */
 

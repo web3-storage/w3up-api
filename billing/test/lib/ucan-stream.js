@@ -1,13 +1,14 @@
 import { Schema } from '@ucanto/core'
-import * as ServiceBlobCaps from '@web3-storage/capabilities/web3.storage/blob'
-import * as BlobCaps from '@web3-storage/capabilities/blob'
-import * as StoreCaps from '@web3-storage/capabilities/store'
+import * as BlobCaps from '@storacha/capabilities/blob'
+import * as SpaceBlobCaps from '@storacha/capabilities/space/blob'
+import * as StoreCaps from '@storacha/capabilities/store'
+import { parse as parseDID, decode as decodeDID } from '@ipld/dag-ucan/did'
 import { findSpaceUsageDeltas, storeSpaceUsageDeltas } from '../../lib/ucan-stream.js'
 import { randomConsumer } from '../helpers/consumer.js'
 import { randomLink } from '../helpers/dag.js'
 import { randomDID, randomDIDKey } from '../helpers/did.js'
 
-/** @type {import('./api').TestSuite<import('./api').UCANStreamTestContext>} */
+/** @type {import('./api.js').TestSuite<import('./api.js').UCANStreamTestContext>} */
 export const test = {
   'should filter UCANs': async (/** @type {import('entail').assert} */ assert, ctx) => {
     /** @type {import('../../lib/api.js').UcanStreamMessage[]} */
@@ -29,10 +30,10 @@ export const test = {
 
     /**
      * @type {import('../../lib/api.js').UcanReceiptMessage<[
-     *   | import('@web3-storage/capabilities/types').BlobAccept
-     *   | import('@web3-storage/capabilities/types').BlobRemove
-     *   | import('@web3-storage/capabilities/types').StoreAdd
-     *   | import('@web3-storage/capabilities/types').StoreRemove
+     *   | import('@storacha/capabilities/types').BlobAccept
+     *   | import('@storacha/capabilities/types').SpaceBlobRemove
+     *   | import('@storacha/capabilities/types').StoreAdd
+     *   | import('@storacha/capabilities/types').StoreRemove
      * ]>[]}
      */
     const receipts = [{
@@ -42,7 +43,7 @@ export const test = {
       value: {
         att: [{
           with: await randomDIDKey(),
-          can: ServiceBlobCaps.accept.can,
+          can: BlobCaps.accept.can,
           nb: {
             _put: {
               "ucan/await": [
@@ -54,7 +55,7 @@ export const test = {
               digest: randomLink().multihash.bytes,
               size: 138
             },
-            space: await randomDIDKey()
+            space: parseDID(await randomDIDKey())
           }
         }],
         aud: await randomDID(),
@@ -69,7 +70,7 @@ export const test = {
       value: {
         att: [{
           with: await randomDIDKey(),
-          can: BlobCaps.remove.can,
+          can: SpaceBlobCaps.remove.can,
           nb: {
             digest: randomLink().multihash.bytes
           }
@@ -124,8 +125,8 @@ export const test = {
       assert.ok(deltas.some(d => (
         d.cause.toString() === r.invocationCid.toString() &&
         // resource for blob accept is found in the caveats
-        (r.value.att[0].can === ServiceBlobCaps.accept.can
-          ? d.resource === r.value.att[0].nb.space
+        (r.value.att[0].can === BlobCaps.accept.can
+          ? d.resource === decodeDID(r.value.att[0].nb.space).did()
           : d.resource === r.value.att[0].with)
       )))
     }
@@ -137,7 +138,7 @@ export const test = {
 
     const from = new Date()
 
-    /** @type {import('../../lib/api.js').UcanReceiptMessage<[import('@web3-storage/capabilities/types').StoreAdd]>[]} */
+    /** @type {import('../../lib/api.js').UcanReceiptMessage<[import('@storacha/capabilities/types').StoreAdd]>[]} */
     const receipts = [{
       type: 'receipt',
       carCid: randomLink(),
@@ -208,7 +209,7 @@ export const test = {
 
     const from = new Date()
 
-    /** @type {import('../../lib/api.js').UcanReceiptMessage<[import('@web3-storage/capabilities/types').StoreAdd]>[]} */
+    /** @type {import('../../lib/api.js').UcanReceiptMessage<[import('@storacha/capabilities/types').StoreAdd]>[]} */
     const receipts = [{
       type: 'receipt',
       carCid: randomLink(),
@@ -233,7 +234,7 @@ export const test = {
 
     const deltas = findSpaceUsageDeltas(receipts)
     const storeDeltasRes = await storeSpaceUsageDeltas(deltas, ctx)
-    assert.equal(storeDeltasRes.error?.name, 'InsufficientRecords')
+    assert.equal(storeDeltasRes.ok, 'no space diffs to store')
 
     const res = await ctx.spaceDiffStore.list({
       provider: consumer.provider,

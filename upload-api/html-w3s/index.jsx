@@ -177,8 +177,7 @@ export const ValidateEmail = ({ ucan, qrcode, email, audience, stripePricingTabl
       {showPricingTable && (
         <div class="box wide">
           <p style={{ textAlign: 'center', color: 'white', fontSize: '20px', fontWeight: 'bold' }}>In order to <span style={{ textDecoration: 'underline' }}>upload data</span> you need to sign up for a billing plan:</p>
-          { // @ts-expect-error preact's types aren't happy with a string here, but it works fine
-            preact.createElement('stripe-pricing-table', {
+          {preact.createElement('stripe-pricing-table', {
               'pricing-table-id': stripePricingTableId,
               'publishable-key': stripePublishableKey,
               'customer-email': email,

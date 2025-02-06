@@ -9,8 +9,8 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb'
 import { getDynamoClient } from '../../lib/aws/dynamo.js'
 
 /**
- * @typedef {import('../types').SubscriptionTable} SubscriptionTable
- * @typedef {import('../types').SubscriptionInput} SubscriptionInput
+ * @typedef {import('../types.js').SubscriptionTable} SubscriptionTable
+ * @typedef {import('../types.js').SubscriptionInput} SubscriptionInput
  */
 
 export class ConflictError extends Failure {
@@ -82,7 +82,7 @@ export function useSubscriptionTable (dynamoDb, tableName) {
     /**
      * Get a subscription by ID.
      * 
-     * @param {import('@web3-storage/upload-api').ProviderDID} provider 
+     * @param {import('@storacha/upload-api').ProviderDID} provider 
      * @param {string} subscription 
      * @returns 
      */

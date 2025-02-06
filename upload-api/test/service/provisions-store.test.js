@@ -2,7 +2,7 @@
 import { test } from '../helpers/context.js'
 import { executionContextToUcantoTestServerContext } from "../helpers/ucan.js"
 import { assertsFromExecutionContext } from '../helpers/assert.js'
-import { provisionsStorageTests } from '@web3-storage/upload-api/test'
+import { provisionsStorageTests } from '@storacha/upload-api/test'
 import {
   createS3,
   createDynamodDb,

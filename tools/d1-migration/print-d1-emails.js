@@ -1,4 +1,4 @@
-import * as DidMailto from '@web3-storage/did-mailto'
+import * as DidMailto from '@storacha/did-mailto'
 import { exec as childProcessExec } from 'child_process'
 import { mustGetEnv } from '../../lib/env.js'
 

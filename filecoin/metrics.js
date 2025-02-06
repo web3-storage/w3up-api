@@ -4,13 +4,13 @@ import * as Block from 'multiformats/block'
 import { sha256 } from 'multiformats/hashes/sha2'
 import { Piece } from '@web3-storage/data-segment'
 
-import { hasOkReceipt } from '@web3-storage/w3infra-upload-api/utils.js'
+import { hasOkReceipt } from '@storacha/upload-service-infra-upload-api/utils.js'
 import { AGGREGATE_ACCEPT, AGGREGATE_OFFER, METRICS_NAMES } from './constants.js'
 import { DecodeBlockOperationError, NotFoundWorkflowError } from './errors.js'
 
 /**
- * @typedef {import('@web3-storage/capabilities/types.js').AggregateOffer} AggregateOffer
- * @typedef {import('@web3-storage/capabilities/types.js').AggregateAccept} AggregateAccept
+ * @typedef {import('@storacha/capabilities/types').AggregateOffer} AggregateOffer
+ * @typedef {import('@storacha/capabilities/types').AggregateAccept} AggregateAccept
  * @typedef {import('@web3-storage/data-segment').PieceLink} PieceLink
  * @typedef {{ capabilities: AggregateOffer[], invocationCid: string }} AggregateOfferInvocation
  * @typedef {{ capabilities: AggregateAccept[], invocationCid: string }} AggregateAcceptInvocation
@@ -24,8 +24,8 @@ import { DecodeBlockOperationError, NotFoundWorkflowError } from './errors.js'
  * Metrics:
  * - AGGREGATE_ACCEPT_TOTAL: increment number of `aggregate/accept` success receipts
  * 
- * @param {import('@web3-storage/w3infra-upload-api/types.js').UcanStreamInvocation[]} ucanInvocations
- * @param {import('./types').FilecoinMetricsCtx} ctx
+ * @param {import('@storacha/upload-service-infra-upload-api/types.js').UcanStreamInvocation[]} ucanInvocations
+ * @param {import('./types.js').FilecoinMetricsCtx} ctx
  */
 export async function updateAggregateAcceptTotal (ucanInvocations, ctx) {
   const aggregateAcceptInvocations = ucanInvocations
@@ -39,7 +39,7 @@ export async function updateAggregateAcceptTotal (ucanInvocations, ctx) {
 
   await ctx.filecoinMetricsStore.incrementTotals({
     [METRICS_NAMES.AGGREGATE_ACCEPT_TOTAL]: aggregateAcceptInvocations.length
-    // TODO: time needed in receipt https://github.com/web3-storage/w3up/issues/970
+    // TODO: time needed in receipt https://github.com/storacha/w3up/issues/970
   })
 }
 
@@ -50,8 +50,8 @@ export async function updateAggregateAcceptTotal (ucanInvocations, ctx) {
  * - AGGREGATE_OFFER_PIECES_TOTAL: increment number of pieces included in `aggregate/offer` success receipts
  * - AGGREGATE_OFFER_PIECES_SIZE_TOTAL: increment size of pieces included of `aggregate/offer` success receipts
  *
- * @param {import('@web3-storage/w3infra-upload-api/types.js').UcanStreamInvocation[]} ucanInvocations
- * @param {import('./types').FilecoinAggregateOfferMetricsCtx} ctx
+ * @param {import('@storacha/upload-service-infra-upload-api/types.js').UcanStreamInvocation[]} ucanInvocations
+ * @param {import('./types.js').FilecoinAggregateOfferMetricsCtx} ctx
  */
 export async function updateAggregateOfferTotal (ucanInvocations, ctx) {
   // Get a Map of workflows that include aggregate offer receipts
@@ -104,9 +104,9 @@ export async function updateAggregateOfferTotal (ucanInvocations, ctx) {
 /**
  * Get a map of workflows that include given capability.
  *
- * @param {import('@web3-storage/w3infra-upload-api/types.js').UcanStreamInvocation[]} ucanInvocations
+ * @param {import('@storacha/upload-service-infra-upload-api/types.js').UcanStreamInvocation[]} ucanInvocations
  * @param {string} capability
- * @param {import('./types').FilecoinAggregateOfferMetricsCtx} ctx
+ * @param {import('./types.js').FilecoinAggregateOfferMetricsCtx} ctx
  */
 function getWorkflowsWithReceiptForCapability (ucanInvocations, capability, ctx) {
   return ucanInvocations
@@ -138,7 +138,7 @@ function getWorkflowsWithReceiptForCapability (ucanInvocations, capability, ctx)
 
 /**
  * @param {string} taskCid
- * @param {import('./types').FilecoinAggregateOfferMetricsCtx} ctx
+ * @param {import('./types.js').FilecoinAggregateOfferMetricsCtx} ctx
  */
 async function getAgentMessage (taskCid, ctx) {
   // TODO: When we distinct between TaskCid and InvocationCid, we also need to see this mapping.

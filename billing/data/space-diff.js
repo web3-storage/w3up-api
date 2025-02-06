@@ -2,11 +2,11 @@ import * as Link from 'multiformats/link'
 import { EncodeFailure, DecodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').SpaceDiff} SpaceDiff
- * @typedef {import('../types').InferStoreRecord<SpaceDiff> & { pk: string, sk: string }} SpaceDiffStoreRecord
- * @typedef {import('../lib/api').SpaceDiffListKey} SpaceDiffListKey
+ * @typedef {import('../lib/api.js').SpaceDiff} SpaceDiff
+ * @typedef {import('../types.js').InferStoreRecord<SpaceDiff> & { pk: string, sk: string }} SpaceDiffStoreRecord
+ * @typedef {import('../lib/api.js').SpaceDiffListKey} SpaceDiffListKey
  * @typedef {{ pk: string, sk: string }} SpaceDiffListStoreRecord
- * @typedef {import('../types').StoreRecord} StoreRecord
+ * @typedef {import('../types.js').StoreRecord} StoreRecord
  */
 
 export const schema = Schema.struct({
@@ -19,10 +19,10 @@ export const schema = Schema.struct({
   insertedAt: Schema.date()
 })
 
-/** @type {import('../lib/api').Validator<SpaceDiff>} */
+/** @type {import('../lib/api.js').Validator<SpaceDiff>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<SpaceDiff, SpaceDiffStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<SpaceDiff, SpaceDiffStoreRecord>} */
 export const encode = input => {
   try {
     return {
@@ -47,7 +47,7 @@ export const encode = input => {
 
 
 
-/** @type {import('../lib/api').Decoder<StoreRecord, SpaceDiff>} */
+/** @type {import('../lib/api.js').Decoder<StoreRecord, SpaceDiff>} */
 export const decode = input => {
   try {
     return {
@@ -69,7 +69,7 @@ export const decode = input => {
 }
 
 export const lister = {
-  /** @type {import('../lib/api').Encoder<SpaceDiffListKey, SpaceDiffListStoreRecord>} */
+  /** @type {import('../lib/api.js').Encoder<SpaceDiffListKey, SpaceDiffListStoreRecord>} */
   encodeKey: input => ({
     ok: {
       pk: `${input.provider}#${input.space}`,

@@ -1,7 +1,7 @@
 import {
   aggregateOffer,
   aggregateAccept
-} from '@web3-storage/capabilities/filecoin/dealer'
+} from '@storacha/capabilities/filecoin/dealer'
 
 export const STREAM_TYPE = {
   WORKFLOW: 'workflow',

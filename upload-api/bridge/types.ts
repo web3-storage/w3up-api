@@ -1,4 +1,4 @@
-import { PrincipalView } from "@ipld/dag-ucan/."
+import { PrincipalView } from '@ipld/dag-ucan'
 import { Ability, DID, Delegation, Failure, Principal, Result, Receipt, OutcomeModel, Signature } from "@ucanto/interface"
 import { ed25519 } from '@ucanto/principal'
 

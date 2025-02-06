@@ -2,11 +2,9 @@ import * as Sentry from '@sentry/serverless'
 import { Config } from 'sst/node/config'
 import { unmarshall } from '@aws-sdk/util-dynamodb'
 import * as Delegation from '@ucanto/core/delegation'
-import { fromString } from 'uint8arrays/from-string'
-import * as DID from '@ipld/dag-ucan/did'
-
-import * as storefrontEvents from '@web3-storage/filecoin-api/storefront/events'
-
+import * as Link from 'multiformats/link'
+import { base64 } from 'multiformats/bases/base64'
+import * as storefrontEvents from '@storacha/filecoin-api/storefront/events'
 import { decodeRecord } from '../store/piece.js'
 import { getServiceConnection, getServiceSigner } from '../service.js'
 import { mustGetEnv } from '../../lib/env.js'
@@ -18,15 +16,15 @@ Sentry.AWSLambda.init({
 })
 
 /**
- * @typedef {import('../types').PieceStoreRecord} PieceStoreRecord
+ * @typedef {import('../types.js').PieceStoreRecord} PieceStoreRecord
  */
 
 /**
  * @param {import('aws-lambda').DynamoDBStreamEvent} event
  */
 async function pieceCidReport (event) {
-  const { contentClaimsDid, contentClaimsUrl, contentClaimsProof } = getEnv()
-  const { CONTENT_CLAIMS_PRIVATE_KEY: contentClaimsPrivateKey } = Config
+  const { indexingServiceDid, indexingServiceUrl } = getEnv()
+  const { PRIVATE_KEY: privateKey, INDEXING_SERVICE_PROOF: indexingServiceProof } = Config
 
   const records = parseDynamoDbEvent(event)
   if (records.length > 1) {
@@ -39,30 +37,21 @@ async function pieceCidReport (event) {
   const record = decodeRecord(storeRecord)
 
   const connection = getServiceConnection({
-    did: contentClaimsDid,
-    url: contentClaimsUrl
+    did: indexingServiceDid,
+    url: indexingServiceUrl
   })
-  let claimsIssuer = getServiceSigner({
-    privateKey: contentClaimsPrivateKey
-  })
-  const claimsProofs = []
-  if (contentClaimsProof) {
-    const proof = await Delegation.extract(fromString(contentClaimsProof, 'base64pad'))
-      if (!proof.ok) throw new Error('failed to extract proof', { cause: proof.error })
-      claimsProofs.push(proof.ok)
-  } else {
-    // if no proofs, we must be using the service private key to sign
-    claimsIssuer = claimsIssuer.withDID(DID.parse(contentClaimsDid).did())
-  }
+  const cid = Link.parse(indexingServiceProof, base64)
+  const proof = await Delegation.extract(cid.multihash.digest)
+  if (!proof.ok) throw new Error('failed to extract proof', { cause: proof.error })
 
   const context = {
     claimsService: {
       connection,
       invocationConfig: {
-        issuer: claimsIssuer,
+        issuer: getServiceSigner({ privateKey }),
         audience: connection.id,
-        with: claimsIssuer.did(),
-        proofs: claimsProofs
+        with: connection.id.did(),
+        proofs: [proof.ok]
       },
     },
   }
@@ -89,9 +78,8 @@ export const main = Sentry.AWSLambda.wrapHandler(pieceCidReport)
  */
 function getEnv() {
   return {
-    contentClaimsDid: mustGetEnv('CONTENT_CLAIMS_DID'),
-    contentClaimsUrl: mustGetEnv('CONTENT_CLAIMS_URL'),
-    contentClaimsProof: process.env.CONTENT_CLAIMS_PROOF,
+    indexingServiceDid: mustGetEnv('INDEXING_SERVICE_DID'),
+    indexingServiceUrl: mustGetEnv('INDEXING_SERVICE_URL'),
   }
 }
 

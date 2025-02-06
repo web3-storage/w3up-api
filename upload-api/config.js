@@ -24,10 +24,10 @@ export function getServiceSigner(config) {
  * Given a string, parse into provider ServiceDIDs. 
  * 
  * @param {string} serviceDids a comma-separated string of ServiceDIDs
- * @returns {import('@web3-storage/upload-api').ServiceDID[]}
+ * @returns {import('@storacha/upload-api').ServiceDID[]}
  */
 export function parseServiceDids(serviceDids) {
-  return /** @type {import('@web3-storage/upload-api').ServiceDID[]} */(
+  return /** @type {import('@storacha/upload-api').ServiceDID[]} */(
     serviceDids.split(',').map(s => {
       const did = DID.parse(s.trim()).did()
       if (!did.startsWith('did:web:')) {
@@ -44,8 +44,8 @@ export function parseServiceDids(serviceDids) {
  * @returns 
  */
 export function getServiceConnection (config) {
-  const servicePrincipal = DID.parse(config.did) // 'did:web:web3.storage'
-  const serviceURL = new URL(config.url) // 'https://tracker.web3.storage'
+  const servicePrincipal = DID.parse(config.did) // 'did:web:up.storacha.network'
+  const serviceURL = new URL(config.url) // 'https://up.storacha.network'
 
   const serviceConnection = connect({
     id: servicePrincipal,

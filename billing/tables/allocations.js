@@ -41,7 +41,7 @@ const indexName = 'space-insertedAt-index'
 /**
  * @param {{ region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient} conf
  * @param {{ tableName: string }} context
- * @returns {import('../lib/api').AllocationStore}
+ * @returns {import('../lib/api.js').AllocationStore}
  */
 export const createAllocationStore = (conf, { tableName }) => ({
   ...createStoreGetterClient(conf, { tableName, encodeKey, decode }),
@@ -73,12 +73,12 @@ export const createAllocationStore = (conf, { tableName }) => ({
  * conf: { region: string } | import('@aws-sdk/client-dynamodb').DynamoDBClient,
  * tableName: string,
  * indexName: string,
- * decode: import('../lib/api').Decoder<import('../types').StoreRecord, V> }} listBetweenConfig
+ * decode: import('../lib/api.js').Decoder<import('../types.js').StoreRecord, V> }} listBetweenConfig
  * @param {{
- * space: import('../lib/api').ConsumerDID,
+ * space: import('../lib/api.js').ConsumerDID,
  * from: Date,
  * to: Date,
- * options?: import('../lib/api').Pageable }} listBetweenParams
+ * options?: import('../lib/api.js').Pageable }} listBetweenParams
  */
 export async function listBetweenWithConfig(
   listBetweenConfig,

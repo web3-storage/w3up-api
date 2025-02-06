@@ -1,5 +1,5 @@
 {
-  "name": "@web3-storage/w3infra-psa",
+  "name": "@storacha/upload-service-infra-psa",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

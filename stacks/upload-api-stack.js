@@ -13,7 +13,6 @@ import { BillingStack } from './billing-stack.js'
 import { CarparkStack } from './carpark-stack.js'
 import { FilecoinStack } from './filecoin-stack.js'
 import { UcanInvocationStack } from './ucan-invocation-stack.js'
-import { IndexerStack } from './indexer-stack.js'
 
 import { getCustomDomain, getApiPackageJson, getGitInfo, setupSentry, getEnv, getEventSourceConfig, getServiceURL } from './config.js'
 
@@ -34,9 +33,8 @@ export function UploadApiStack({ stack, app }) {
 
   const {
     AGGREGATOR_DID,
-    CONTENT_CLAIMS_DID,
-    CONTENT_CLAIMS_URL,
-    CONTENT_CLAIMS_PROOF,
+    INDEXING_SERVICE_DID,
+    INDEXING_SERVICE_URL,
   } = getEnv()
 
   // Setup app monitoring with Sentry
@@ -44,11 +42,10 @@ export function UploadApiStack({ stack, app }) {
 
   // Get references to constructs created in other stacks
   const { carparkBucket } = use(CarparkStack)
-  const { allocationTable, storeTable, uploadTable, delegationBucket, delegationTable, revocationTable, adminMetricsTable, spaceMetricsTable, consumerTable, subscriptionTable, rateLimitTable, pieceTable, privateKey, contentClaimsPrivateKey } = use(UploadDbStack)
-  const { invocationBucket, taskBucket, workflowBucket, ucanStream } = use(UcanInvocationStack)
+  const { allocationTable, blobRegistryTable, storeTable, uploadTable, delegationBucket, delegationTable, revocationTable, adminMetricsTable, spaceMetricsTable, consumerTable, subscriptionTable, storageProviderTable, rateLimitTable, pieceTable, privateKey, indexingServiceProof } = use(UploadDbStack)
+  const { agentIndexBucket, agentMessageBucket, ucanStream } = use(UcanInvocationStack)
   const { customerTable, spaceDiffTable, spaceSnapshotTable, egressTrafficTable, stripeSecretKey } = use(BillingDbStack)
   const { pieceOfferQueue, filecoinSubmitQueue } = use(FilecoinStack)
-  const { blockAdvertPublisherQueue, blockIndexWriterQueue } = use(IndexerStack)
   const { egressTrafficQueue } = use(BillingStack)
 
   // Setup API
@@ -69,13 +66,14 @@ export function UploadApiStack({ stack, app }) {
         function: {
           timeout: '60 seconds',
           permissions: [
-            allocationTable,
-            storeTable,
+            allocationTable, // legacy
+            blobRegistryTable,
+            storeTable, // legacy
             uploadTable,
             customerTable,
             delegationTable,
-            revocationTable,
             delegationBucket,
+            revocationTable,
             consumerTable,
             subscriptionTable,
             rateLimitTable,
@@ -84,22 +82,21 @@ export function UploadApiStack({ stack, app }) {
             pieceTable,
             spaceDiffTable,
             spaceSnapshotTable,
+            storageProviderTable,
             egressTrafficTable,
             carparkBucket,
-            invocationBucket,
-            taskBucket,
-            workflowBucket,
+            agentIndexBucket,
+            agentMessageBucket,
             ucanStream,
             pieceOfferQueue,
             filecoinSubmitQueue,
-            blockAdvertPublisherQueue,
-            blockIndexWriterQueue,
             egressTrafficQueue,
           ],
           environment: {
             DID: process.env.UPLOAD_API_DID ?? '',
             AGGREGATOR_DID,
             ALLOCATION_TABLE_NAME: allocationTable.tableName,
+            BLOB_REGISTRY_TABLE_NAME: blobRegistryTable.tableName,
             STORE_TABLE_NAME: storeTable.tableName,
             STORE_BUCKET_NAME: carparkBucket.bucketName,
             UPLOAD_TABLE_NAME: uploadTable.tableName,
@@ -107,22 +104,20 @@ export function UploadApiStack({ stack, app }) {
             CUSTOMER_TABLE_NAME: customerTable.tableName,
             SUBSCRIPTION_TABLE_NAME: subscriptionTable.tableName,
             SPACE_METRICS_TABLE_NAME: spaceMetricsTable.tableName,
+            ADMIN_METRICS_TABLE_NAME: adminMetricsTable.tableName,
             RATE_LIMIT_TABLE_NAME: rateLimitTable.tableName,
             DELEGATION_TABLE_NAME: delegationTable.tableName,
             REVOCATION_TABLE_NAME: revocationTable.tableName,
             SPACE_DIFF_TABLE_NAME: spaceDiffTable.tableName,
             SPACE_SNAPSHOT_TABLE_NAME: spaceSnapshotTable.tableName,
+            STORAGE_PROVIDER_TABLE_NAME: storageProviderTable.tableName,
             DELEGATION_BUCKET_NAME: delegationBucket.bucketName,
-            INVOCATION_BUCKET_NAME: invocationBucket.bucketName,
-            TASK_BUCKET_NAME: taskBucket.bucketName,
-            WORKFLOW_BUCKET_NAME: workflowBucket.bucketName,
+            AGENT_INDEX_BUCKET_NAME: agentIndexBucket.bucketName,
+            AGENT_MESSAGE_BUCKET_NAME: agentMessageBucket.bucketName,
             UCAN_LOG_STREAM_NAME: ucanStream.streamName,
-            ADMIN_METRICS_TABLE_NAME: adminMetricsTable.tableName,
             PIECE_TABLE_NAME: pieceTable.tableName,
             PIECE_OFFER_QUEUE_URL: pieceOfferQueue.queueUrl,
             FILECOIN_SUBMIT_QUEUE_URL: filecoinSubmitQueue.queueUrl,
-            BLOCK_ADVERT_PUBLISHER_QUEUE_URL: blockAdvertPublisherQueue.queueUrl,
-            BLOCK_INDEX_WRITER_QUEUE_URL: blockIndexWriterQueue.queueUrl,
             EGRESS_TRAFFIC_QUEUE_URL: egressTrafficQueue.queueUrl,
             NAME: pkg.name,
             VERSION: pkg.version,
@@ -146,16 +141,16 @@ export function UploadApiStack({ stack, app }) {
             DEAL_TRACKER_DID: process.env.DEAL_TRACKER_DID ?? '',
             DEAL_TRACKER_URL: process.env.DEAL_TRACKER_URL ?? '',
             REFERRALS_ENDPOINT: process.env.REFERRALS_ENDPOINT ?? '',
-            CONTENT_CLAIMS_DID,
-            CONTENT_CLAIMS_URL,
-            CONTENT_CLAIMS_PROOF,
+            INDEXING_SERVICE_DID,
+            INDEXING_SERVICE_URL,
             HOSTED_ZONE: hostedZone ?? '',
+            PRINCIPAL_MAPPING: process.env.PRINCIPAL_MAPPING ?? ''
           },
           bind: [
             privateKey,
             ucanInvocationPostbasicAuth,
             stripeSecretKey,
-            contentClaimsPrivateKey
+            indexingServiceProof,
           ]
         }
       },

@@ -2,9 +2,9 @@ import Big from 'big.js'
 import {GB} from './util.js'
 
 /**
- * @param {import('./api').SpaceDiffListKey & { to: Date }} params
- * @param {{ spaceDiffStore: import('./api').SpaceDiffStore }} ctx
- * @returns {AsyncIterable<import('@ucanto/interface').Result<import('./api').SpaceDiff[], import('@ucanto/interface').Failure>>}
+ * @param {import('./api.js').SpaceDiffListKey & { to: Date }} params
+ * @param {{ spaceDiffStore: import('./api.js').SpaceDiffStore }} ctx
+ * @returns {AsyncIterable<import('@ucanto/interface').Result<import('./api.js').SpaceDiff[], import('@ucanto/interface').Failure>>}
  */
 export const iterateSpaceDiffs = async function * ({ provider, space, from, to }, ctx) {
   /** @type {string|undefined} */
@@ -39,10 +39,10 @@ export const iterateSpaceDiffs = async function * ({ provider, space, from, to }
  * The usage value for the period and the space size at the end of the period
  * are returned to the caller.
  *
- * @param {import('./api').SpaceBillingInstruction} instruction
+ * @param {import('./api.js').SpaceBillingInstruction} instruction
  * @param {{
- *   spaceDiffStore: import('./api').SpaceDiffStore
- *   spaceSnapshotStore: import('./api').SpaceSnapshotStore
+ *   spaceDiffStore: import('./api.js').SpaceDiffStore
+ *   spaceSnapshotStore: import('./api.js').SpaceSnapshotStore
  * }} ctx
  * @returns {Promise<import('@ucanto/interface').Result<{ usage: bigint, size: bigint }>>}
  */
@@ -87,11 +87,11 @@ export const calculatePeriodUsage = async (instruction, ctx) => {
  * period. The _next_ billing period is expected to start on the `to` date of
  * the current period, so that the snapshot will be used in the next cycle.
  *
- * @param {import('./api').SpaceBillingInstruction} instruction
+ * @param {import('./api.js').SpaceBillingInstruction} instruction
  * @param {{ usage: bigint, size: bigint }} calculation
  * @param {{
- *   spaceSnapshotStore: import('./api').SpaceSnapshotStore
- *   usageStore: import('./api').UsageStore
+ *   spaceSnapshotStore: import('./api.js').SpaceSnapshotStore
+ *   usageStore: import('./api.js').UsageStore
  * }} ctx
  * @returns {Promise<import('@ucanto/interface').Result<import('@ucanto/interface').Unit>>}
  */
@@ -122,13 +122,13 @@ export const storeSpaceUsage = async (instruction, { size, usage }, ctx) => {
  * Additionally, it estimates the usage for the space based on the allocation/store values.  
  * Note: This value is approximate as it doesn’t account for deleted files.
  *
- * @typedef {import('./api').AllocationStore} AllocationStore
- * @typedef {import('./api').StoreTableStore} StoreTableStore
+ * @typedef {import('./api.js').AllocationStore} AllocationStore
+ * @typedef {import('./api.js').StoreTableStore} StoreTableStore
  * @typedef {{allocationStore: AllocationStore}} AllocationStoreCtx
  * @typedef {{storeTableStore: StoreTableStore}} StoreTableStoreCtx
  * 
  * @param {"allocationStore" | "storeTableStore"} store
- * @param {import('./api').SpaceBillingInstruction} instruction
+ * @param {import('./api.js').SpaceBillingInstruction} instruction
  * @param { AllocationStoreCtx | StoreTableStoreCtx} ctx
  * @returns {Promise<import('@ucanto/interface').Result<{ size: bigint , usage: bigint}>>}
  */

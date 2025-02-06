@@ -1,11 +1,11 @@
 import { DecodeFailure, EncodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').SpaceSnapshot} SpaceSnapshot
- * @typedef {import('../types').InferStoreRecord<SpaceSnapshot> & { pk: string }} SpaceSnapshotStoreRecord
- * @typedef {import('../lib/api').SpaceSnapshotKey} SpaceSnapshotKey
- * @typedef {Omit<import('../types').InferStoreRecord<SpaceSnapshotKey>, 'provider'|'space'> & { pk: string }} SpaceSnapshotKeyStoreRecord
- * @typedef {import('../types').StoreRecord} StoreRecord
+ * @typedef {import('../lib/api.js').SpaceSnapshot} SpaceSnapshot
+ * @typedef {import('../types.js').InferStoreRecord<SpaceSnapshot> & { pk: string }} SpaceSnapshotStoreRecord
+ * @typedef {import('../lib/api.js').SpaceSnapshotKey} SpaceSnapshotKey
+ * @typedef {Omit<import('../types.js').InferStoreRecord<SpaceSnapshotKey>, 'provider'|'space'> & { pk: string }} SpaceSnapshotKeyStoreRecord
+ * @typedef {import('../types.js').StoreRecord} StoreRecord
  */
 
 export const schema = Schema.struct({
@@ -16,10 +16,10 @@ export const schema = Schema.struct({
   insertedAt: Schema.date()
 })
 
-/** @type {import('../lib/api').Validator<SpaceSnapshot>} */
+/** @type {import('../lib/api.js').Validator<SpaceSnapshot>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<SpaceSnapshot, SpaceSnapshotStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<SpaceSnapshot, SpaceSnapshotStoreRecord>} */
 export const encode = input => {
   try {
     return {
@@ -39,7 +39,7 @@ export const encode = input => {
   }
 }
 
-/** @type {import('../lib/api').Encoder<SpaceSnapshotKey, SpaceSnapshotKeyStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<SpaceSnapshotKey, SpaceSnapshotKeyStoreRecord>} */
 export const encodeKey = input => ({
   ok: {
     pk: `${input.provider}#${input.space}`,
@@ -47,7 +47,7 @@ export const encodeKey = input => ({
   }
 })
 
-/** @type {import('../lib/api').Decoder<StoreRecord, SpaceSnapshot>} */
+/** @type {import('../lib/api.js').Decoder<StoreRecord, SpaceSnapshot>} */
 export const decode = input => {
   try {
     return {

@@ -25,8 +25,8 @@ export async function waitForStoreOperationOkResult (fn, verifyResFn) {
 
 /**
  * 
- * @param {import('@web3-storage/w3up-client').Client} client 
- * @param {import('@web3-storage/w3up-client/account').Account} account 
+ * @param {import('@storacha/client').Client} client 
+ * @param {import('@storacha/client/account').Account} account 
  */
 export async function getUsage(client, account) {
   /** @type {Record<`did:${string}:${string}`, number>} */

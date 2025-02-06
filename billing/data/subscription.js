@@ -2,13 +2,13 @@ import * as Link from 'multiformats/link'
 import { DecodeFailure, EncodeFailure, Schema } from './lib.js'
 
 /**
- * @typedef {import('../lib/api').Subscription} Subscription
- * @typedef {import('../types').InferStoreRecord<Subscription>} SubscriptionStoreRecord
- * @typedef {import('../lib/api').SubscriptionKey} SubscriptionKey
- * @typedef {import('../types').InferStoreRecord<SubscriptionKey>} SubscriptionKeyStoreRecord
- * @typedef {import('../types').StoreRecord} StoreRecord
- * @typedef {import('../lib/api').SubscriptionListKey} SubscriptionListKey
- * @typedef {import('../types').InferStoreRecord<SubscriptionListKey>} SubscriptionListKeyStoreRecord
+ * @typedef {import('../lib/api.js').Subscription} Subscription
+ * @typedef {import('../types.js').InferStoreRecord<Subscription>} SubscriptionStoreRecord
+ * @typedef {import('../lib/api.js').SubscriptionKey} SubscriptionKey
+ * @typedef {import('../types.js').InferStoreRecord<SubscriptionKey>} SubscriptionKeyStoreRecord
+ * @typedef {import('../types.js').StoreRecord} StoreRecord
+ * @typedef {import('../lib/api.js').SubscriptionListKey} SubscriptionListKey
+ * @typedef {import('../types.js').InferStoreRecord<SubscriptionListKey>} SubscriptionListKeyStoreRecord
  * @typedef {Pick<Subscription, 'customer'|'provider'|'subscription'|'cause'>} SubscriptionList
  */
 
@@ -21,10 +21,10 @@ const schema = Schema.struct({
   updatedAt: Schema.date().optional()
 })
 
-/** @type {import('../lib/api').Validator<Subscription>} */
+/** @type {import('../lib/api.js').Validator<Subscription>} */
 export const validate = input => schema.read(input)
 
-/** @type {import('../lib/api').Encoder<Subscription, SubscriptionStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<Subscription, SubscriptionStoreRecord>} */
 export const encode = input => {
   try {
     return {
@@ -44,7 +44,7 @@ export const encode = input => {
   }
 }
 
-/** @type {import('../lib/api').Encoder<SubscriptionKey, SubscriptionKeyStoreRecord>} */
+/** @type {import('../lib/api.js').Encoder<SubscriptionKey, SubscriptionKeyStoreRecord>} */
 export const encodeKey = input => ({
   ok: {
     provider: input.provider,
@@ -52,7 +52,7 @@ export const encodeKey = input => ({
   }
 })
 
-/** @type {import('../lib/api').Decoder<StoreRecord, Subscription>} */
+/** @type {import('../lib/api.js').Decoder<StoreRecord, Subscription>} */
 export const decode = input => {
   try {
     return {
@@ -74,9 +74,9 @@ export const decode = input => {
 
 /** Encoders/decoders for listings. */
 export const lister = {
-  /** @type {import('../lib/api').Encoder<SubscriptionListKey, SubscriptionListKeyStoreRecord>} */
+  /** @type {import('../lib/api.js').Encoder<SubscriptionListKey, SubscriptionListKeyStoreRecord>} */
   encodeKey: input => ({ ok: { customer: input.customer } }),
-  /** @type {import('../lib/api').Decoder<StoreRecord, SubscriptionList>} */
+  /** @type {import('../lib/api.js').Decoder<StoreRecord, SubscriptionList>} */
   decode: input => {
     try {
       return {
